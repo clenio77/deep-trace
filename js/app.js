@@ -77,7 +77,7 @@ window.DeepTraceApp = class DeepTraceApp {
         this._updateMetrics();
         this._syncBottomNav();
         
-        // Lógica temporária de teste para simular cliques de demos por query param
+        // Inicializa uma análise específica via query param se fornecido (ex: vindo da extensão ou carregamento direto)
         try {
             const params = new URLSearchParams(window.location.search);
             const testDemoId = params.get('testDemoId');
@@ -90,7 +90,7 @@ window.DeepTraceApp = class DeepTraceApp {
                 }
             }
         } catch (e) {
-            console.error('Erro no teste temporário:', e);
+            console.error('[DeepTrace] Erro na inicialização automática de demo/análise:', e);
         }
     }
 
