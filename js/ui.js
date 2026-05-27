@@ -219,6 +219,14 @@ window.DeepTraceUI = class DeepTraceUI {
 
       grid.appendChild(card);
     });
+
+    // Botão limpar histórico
+    const actionsDiv = document.createElement('div');
+    actionsDiv.className = 'history-actions';
+    actionsDiv.innerHTML = `
+      <button class="btn-clear-history" id="btn-clear-history">🗑️ Limpar Histórico</button>
+    `;
+    grid.parentNode.appendChild(actionsDiv);
   }
 
   /**
@@ -229,6 +237,103 @@ window.DeepTraceUI = class DeepTraceUI {
     if (section) {
       section.innerHTML = '';
     }
+  }
+
+  /**
+   * Renderiza contadores de métricas animados.
+   * @param {Object} metrics — {total, fakeCount, avgScore}
+   */
+  renderMetrics(metrics) {
+    const metricTotal = document.getElementById('metric-total');
+    const metricFake = document.getElementById('metric-fake');
+    const metricScore = document.getElementById('metric-score');
+
+    if (metricTotal) {
+      metricTotal.dataset.target = metrics.total;
+      this._animateScoreCounter(metricTotal, metrics.total);
+    }
+    if (metricFake) {
+      metricFake.dataset.target = metrics.fakeCount;
+      this._animateScoreCounter(metricFake, metrics.fakeCount);
+    }
+    if (metricScore) {
+      metricScore.dataset.target = metrics.avgScore;
+      this._animateScoreCounter(metricScore, metrics.avgScore);
+    }
+  }
+
+  /**
+   * Inicializa o accordion da seção FAQ.
+   */
+  initFaqAccordion() {
+    const faqItems = document.querySelectorAll('.faq-question');
+    faqItems.forEach((question) => {
+      const answer = question.nextElementSibling;
+      if (!answer) return;
+
+      const toggle = () => {
+        const expanded = question.getAttribute('aria-expanded') === 'true';
+        question.setAttribute('aria-expanded', !expanded);
+
+        if (!expanded) {
+          answer.style.maxHeight = answer.scrollHeight + 'px';
+          answer.style.paddingTop = '0';
+        } else {
+          answer.style.maxHeight = '0';
+          answer.style.paddingTop = '0';
+        }
+      };
+
+      question.addEventListener('click', toggle);
+      question.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          toggle();
+        }
+      });
+    });
+  }
+
+  /**
+   * Exibe um modal de confirmação genérico.
+   * @param {string} title — Título do modal
+   * @param {string} message — Mensagem do modal
+   * @returns {Promise<boolean>} — true se confirmou, false se cancelou
+   */
+  showConfirmModal(title, message) {
+    return new Promise((resolve) => {
+      const overlay = document.createElement('div');
+      overlay.className = 'confirm-modal-overlay';
+      overlay.innerHTML = `
+        <div class="confirm-modal">
+          <h3>${this._escapeHtml(title)}</h3>
+          <p>${this._escapeHtml(message)}</p>
+          <div class="confirm-modal__actions">
+            <button class="btn-secondary confirm-cancel">Cancelar</button>
+            <button class="btn-primary confirm-ok" style="background: #ef4444;">Confirmar</button>
+          </div>
+        </div>
+      `;
+
+      overlay.querySelector('.confirm-cancel').addEventListener('click', () => {
+        overlay.remove();
+        resolve(false);
+      });
+
+      overlay.querySelector('.confirm-ok').addEventListener('click', () => {
+        overlay.remove();
+        resolve(true);
+      });
+
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+          overlay.remove();
+          resolve(false);
+        }
+      });
+
+      document.body.appendChild(overlay);
+    });
   }
 
   /**
@@ -644,6 +749,9 @@ window.DeepTraceUI = class DeepTraceUI {
           </div>
         </div>
       </div>
+      <button class="btn-reanalyze" id="btn-reanalyze" title="Forçar nova análise ignorando cache">
+        🔄 Re-analisar
+      </button>
     `;
 
     // Inicia animações após inserção no DOM

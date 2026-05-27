@@ -12,7 +12,9 @@
   <meta property="og:type" content="website">
   <meta property="og:title" content="DeepTrace — Detector de Fake News em Vídeos">
   <meta property="og:description" content="Inteligência artificial a serviço da democracia brasileira. Verifique vídeos suspeitos em segundos.">
-  <meta property="og:image" content="assets/logo.png">
+  <meta property="og:image" content="https://deep-trace-nine.vercel.app/assets/og-banner.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
 
   <title>DeepTrace — Detector de Fake News em Vídeos</title>
 
@@ -38,8 +40,10 @@
         <a href="#analyze">Analisar</a>
         <a href="#history">Histórico</a>
         <a href="#how-it-works">Como Funciona</a>
+        <a href="#about">Sobre</a>
+        <a href="#faq">FAQ</a>
         <button id="settings-btn" title="Configurações" aria-label="Abrir configurações">
-          ⚙️
+          ⚙️ <span class="nav-label">Config</span>
         </button>
       </nav>
     </div>
@@ -125,6 +129,26 @@
     </div>
   </section>
 
+  <!-- ===== Métricas ===== -->
+  <div class="metrics-bar" id="metrics-bar">
+    <div class="container">
+      <div class="metrics-grid">
+        <div class="metric-item">
+          <span class="metric-value" id="metric-total" data-target="0">0</span>
+          <span class="metric-label">Vídeos Analisados</span>
+        </div>
+        <div class="metric-item">
+          <span class="metric-value" id="metric-fake" data-target="0">0</span>
+          <span class="metric-label">Fake News Detectadas</span>
+        </div>
+        <div class="metric-item">
+          <span class="metric-value" id="metric-score" data-target="0">0</span>
+          <span class="metric-label">Score Médio (%)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ===== Seção de Histórico ===== -->
   <section class="history-section" id="history">
     <div class="container">
@@ -170,6 +194,104 @@
           <div class="step-number">4</div>
           <h4>Resultado</h4>
           <p>Receba um score de confiabilidade, veredito claro e relatório completo para compartilhar.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Sobre o Projeto ===== -->
+  <section class="about-section" id="about">
+    <div class="container">
+      <div class="section-title fade-in-up">
+        <h2>Sobre o <span class="text-gradient">DeepTrace</span></h2>
+        <p>Transparência e credibilidade no combate à desinformação</p>
+      </div>
+
+      <div class="about-grid">
+        <div class="glass-card about-card fade-in-up">
+          <div class="about-card__icon">🎯</div>
+          <h4>Nossa Missão</h4>
+          <p>Democratizar o acesso a ferramentas de verificação de fatos, capacitando cidadãos brasileiros a identificar desinformação em vídeos políticos e eleitorais com o apoio de inteligência artificial.</p>
+        </div>
+
+        <div class="glass-card about-card fade-in-up">
+          <div class="about-card__icon">🔬</div>
+          <h4>Metodologia</h4>
+          <p>Utilizamos o modelo multimodal Google Gemini 2.0 Flash para transcrever, decompor e verificar cada alegação factual presente no vídeo, confrontando com bases de conhecimento e fontes jornalísticas.</p>
+        </div>
+
+        <div class="glass-card about-card fade-in-up">
+          <div class="about-card__icon">🔒</div>
+          <h4>Privacidade</h4>
+          <p>100% client-side. Sua chave de API, seus vídeos e seu histórico de análises nunca saem do seu navegador. Nenhum dado é enviado para servidores nossos.</p>
+        </div>
+
+        <div class="glass-card about-card fade-in-up">
+          <div class="about-card__icon">🌐</div>
+          <h4>Open Source</h4>
+          <p>Projeto de código aberto no GitHub. Contribuições, auditorias e sugestões da comunidade são bem-vindas para aprimorar a ferramenta continuamente.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FAQ ===== -->
+  <section class="faq-section" id="faq">
+    <div class="container">
+      <div class="section-title fade-in-up">
+        <h2>Perguntas <span class="text-gradient">Frequentes</span></h2>
+        <p>Tire suas dúvidas sobre o funcionamento do DeepTrace</p>
+      </div>
+
+      <div class="faq-list fade-in-up">
+        <div class="faq-item glass-card">
+          <div class="faq-question" role="button" tabindex="0" aria-expanded="false">
+            <span>Como a IA verifica os fatos do vídeo?</span>
+            <span class="faq-chevron">▼</span>
+          </div>
+          <div class="faq-answer">
+            <p>O DeepTrace transcreve o áudio do vídeo, identifica cada alegação factual e as confronta com o conhecimento do modelo Gemini 2.0 Flash, que foi treinado com ampla base de dados jornalísticos e factuais. Cada alegação recebe um score individual de confiança e fontes quando disponíveis.</p>
+          </div>
+        </div>
+
+        <div class="faq-item glass-card">
+          <div class="faq-question" role="button" tabindex="0" aria-expanded="false">
+            <span>Os resultados são 100% confiáveis?</span>
+            <span class="faq-chevron">▼</span>
+          </div>
+          <div class="faq-answer">
+            <p>Não. O DeepTrace é uma ferramenta de apoio à verificação, não um juiz final. Os resultados são gerados por IA e podem conter imprecisões. Sempre consulte múltiplas fontes e agências de fact-checking antes de tirar conclusões definitivas.</p>
+          </div>
+        </div>
+
+        <div class="faq-item glass-card">
+          <div class="faq-question" role="button" tabindex="0" aria-expanded="false">
+            <span>Meus dados são enviados para algum servidor?</span>
+            <span class="faq-chevron">▼</span>
+          </div>
+          <div class="faq-answer">
+            <p>Não. O DeepTrace opera 100% no seu navegador (client-side). Sua chave de API é armazenada localmente no seu dispositivo, e as requisições vão direto do seu navegador para a API do Google Gemini. Nenhum dado passa por servidores intermediários.</p>
+          </div>
+        </div>
+
+        <div class="faq-item glass-card">
+          <div class="faq-question" role="button" tabindex="0" aria-expanded="false">
+            <span>Preciso de uma API key? É pago?</span>
+            <span class="faq-chevron">▼</span>
+          </div>
+          <div class="faq-answer">
+            <p>Sim, você precisa de uma chave gratuita da API Gemini. Basta acessar <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio</a>, criar uma conta Google e gerar a chave em segundos. O uso gratuito oferece uma cota generosa de requisições diárias.</p>
+          </div>
+        </div>
+
+        <div class="faq-item glass-card">
+          <div class="faq-question" role="button" tabindex="0" aria-expanded="false">
+            <span>A extensão Chrome é obrigatória?</span>
+            <span class="faq-chevron">▼</span>
+          </div>
+          <div class="faq-answer">
+            <p>Não. O Web App funciona de forma independente — basta colar o link do vídeo ou fazer upload. A extensão Chrome é opcional e melhora a precisão ao extrair as legendas reais do YouTube diretamente da página, fornecendo a transcrição exata ao modelo de IA.</p>
+          </div>
         </div>
       </div>
     </div>

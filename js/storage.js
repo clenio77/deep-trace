@@ -68,6 +68,7 @@ window.DeepTraceStorage = class DeepTraceStorage {
             summary: analysis.summary || '',
             claims: analysis.claims || [],
             manipulationTechniques: analysis.manipulationTechniques || [],
+            deepfakeAnalysis: analysis.deepfakeAnalysis || null,
             metadata: analysis.metadata || {},
             timestamp: analysis.timestamp || new Date().toISOString()
         };
@@ -227,6 +228,30 @@ window.DeepTraceStorage = class DeepTraceStorage {
             result += String.fromCharCode(charCode);
         }
         return result;
+    }
+
+    /**
+     * Calcula métricas agregadas do histórico de análises.
+     * @returns {Object} Métricas: total, fakeCount, avgScore
+     */
+    getMetrics() {
+        const analyses = this.history.filter(item => !item.id?.startsWith('demo_'));
+        const total = analyses.length;
+        
+        if (total === 0) {
+            return { total: 0, fakeCount: 0, avgScore: 0 };
+        }
+
+        const fakeCount = analyses.filter(item => {
+            const v = (item.verdict || '').toLowerCase();
+            return v.includes('fals') || v === 'false';
+        }).length;
+
+        const avgScore = Math.round(
+            analyses.reduce((sum, item) => sum + (item.overallScore || 0), 0) / total
+        );
+
+        return { total, fakeCount, avgScore };
     }
 
     // ─────────────────────────────────────────────

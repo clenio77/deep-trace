@@ -73,6 +73,8 @@ window.DeepTraceApp = class DeepTraceApp {
         this.ui.initScrollAnimations();
         this._enableSmoothScroll();
         this._checkQueryParamAnalysis();
+        this.ui.initFaqAccordion();
+        this._updateMetrics();
         
         // Lógica temporária de teste para simular cliques de demos por query param
         try {
@@ -184,6 +186,16 @@ window.DeepTraceApp = class DeepTraceApp {
                 }
             });
         }
+
+        // g2) Botão limpar histórico (delegação — renderizado dinamicamente)
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('#btn-clear-history')) {
+                this.handleClearHistory();
+            }
+            if (e.target.closest('#btn-reanalyze')) {
+                this.handleReanalyze();
+            }
+        });
 
         // h) Callback para clique em card do histórico
         this.ui.onHistoryCardClick = (analysis) => this.handleHistoryClick(analysis);
@@ -303,6 +315,7 @@ window.DeepTraceApp = class DeepTraceApp {
             this.storage.saveAnalysis(result);
             this.ui.showResult(result);
             this.loadHistory();
+            this._updateMetrics();
             this._scrollToResult();
         } catch (error) {
             console.error('[DeepTrace] Erro na análise:', error);
@@ -382,6 +395,7 @@ window.DeepTraceApp = class DeepTraceApp {
             this.storage.saveAnalysis(result);
             this.ui.showResult(result);
             this.loadHistory();
+            this._updateMetrics();
             this._scrollToResult();
         } catch (error) {
             console.error('[DeepTrace] Erro na análise de arquivo:', error);
@@ -447,6 +461,16 @@ window.DeepTraceApp = class DeepTraceApp {
         }
 
         this._lastAnalysisTime = agora;
+
+        // Registra no rate limit persistente do storage
+        if (!this.storage.incrementRateLimit()) {
+            this.ui.showToast(
+                'Limite de 10 análises por hora atingido. Aguarde para continuar.',
+                'error'
+            );
+            return false;
+        }
+
         return true;
     }
 
@@ -498,6 +522,53 @@ window.DeepTraceApp = class DeepTraceApp {
         }
 
         return 'Ocorreu um erro inesperado. Tente novamente mais tarde.';
+    }
+
+    /**
+     * Atualiza os contadores de métricas na interface.
+     * @private
+     */
+    _updateMetrics() {
+        const metrics = this.storage.getMetrics();
+        this.ui.renderMetrics(metrics);
+    }
+
+    /**
+     * Força re-análise ignorando o cache.
+     * @private
+     */
+    async handleReanalyze() {
+        const url = this.elements.analyzeInput?.value?.trim();
+        if (!url) {
+            this.ui.showToast('Insira a URL do vídeo para re-analisar.', 'error');
+            return;
+        }
+
+        // Remove do cache antes de re-analisar
+        this.storage.history = this.storage.history.filter(
+            item => !(item.url && item.url.trim().toLowerCase() === url.trim().toLowerCase())
+        );
+        this.storage._saveToStorage();
+
+        await this.handleAnalyze();
+    }
+
+    /**
+     * Limpa todo o histórico de análises com confirmação.
+     */
+    async handleClearHistory() {
+        const confirmed = await this.ui.showConfirmModal(
+            '🗑️ Limpar Histórico',
+            'Tem certeza? Todas as análises anteriores serão removidas permanentemente. Esta ação não pode ser desfeita.'
+        );
+
+        if (confirmed) {
+            this.storage.clearHistory();
+            this.loadHistory();
+            this._updateMetrics();
+            this.ui.clearResult();
+            this.ui.showToast('Histórico limpo com sucesso.', 'success');
+        }
     }
 
     // ──────────────────────────────────────────────

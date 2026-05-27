@@ -294,7 +294,8 @@ Responda SOMENTE o JSON. Nenhum texto antes ou depois.`;
    * @returns {Promise<Object>} Resposta bruta da API
    * @private
    */
-  async _callGeminiApi(body) {
+  async _callGeminiApi(body, _retryCount = 0) {
+    const MAX_RETRIES = 2;
     const url = `${DeepTraceAnalyzer.GEMINI_API_URL}?key=${this._apiKey}`;
 
     // Controlador de timeout
@@ -315,6 +316,14 @@ Responda SOMENTE o JSON. Nenhum texto antes ou depois.`;
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         const status = response.status;
+
+        // Retry para erros de servidor transitórios
+        if ([500, 502, 503].includes(status) && _retryCount < MAX_RETRIES) {
+          const delay = Math.pow(2, _retryCount) * 1000; // 1s, 2s
+          console.warn(`[DeepTrace] API retornou ${status}. Tentando novamente em ${delay}ms (tentativa ${_retryCount + 1}/${MAX_RETRIES})...`);
+          await new Promise(r => setTimeout(r, delay));
+          return this._callGeminiApi(body, _retryCount + 1);
+        }
 
         if (status === 401 || status === 403) {
           throw new Error(
