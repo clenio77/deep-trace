@@ -164,7 +164,7 @@
 
       <!-- ===== Filtros do Histórico ===== -->
       <div class="history-filters fade-in-up" style="display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap;">
-        <select id="filter-platform" class="select-filter" style="background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--glass-border); padding: 8px 16px; border-radius: var(--radius-sm); outline: none; cursor: pointer; font-size: 0.85rem;">
+        <select id="filter-platform" class="select-filter" aria-label="Filtrar por rede social" style="background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--glass-border); padding: 8px 16px; border-radius: var(--radius-sm); outline: none; cursor: pointer; font-size: 0.85rem;">
           <option value="all">Todas as Redes</option>
           <option value="youtube">YouTube</option>
           <option value="tiktok">TikTok</option>
@@ -172,7 +172,7 @@
           <option value="twitter">Twitter/X</option>
           <option value="file">Arquivos Locais</option>
         </select>
-        <select id="filter-verdict" class="select-filter" style="background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--glass-border); padding: 8px 16px; border-radius: var(--radius-sm); outline: none; cursor: pointer; font-size: 0.85rem;">
+        <select id="filter-verdict" class="select-filter" aria-label="Filtrar por veredito" style="background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--glass-border); padding: 8px 16px; border-radius: var(--radius-sm); outline: none; cursor: pointer; font-size: 0.85rem;">
           <option value="all">Todos os Vereditos</option>
           <option value="verdadeiro">Verdadeiro</option>
           <option value="falso">Falso</option>
@@ -198,25 +198,25 @@
       <div class="steps-grid">
         <div class="glass-card step-card fade-in-up">
           <div class="step-number">1</div>
-          <h4>Envie o Vídeo</h4>
+          <h3>Envie o Vídeo</h3>
           <p>Cole o link do vídeo ou faça upload diretamente. Suportamos YouTube, TikTok, Instagram e Twitter.</p>
         </div>
 
         <div class="glass-card step-card fade-in-up">
           <div class="step-number">2</div>
-          <h4>IA Analisa</h4>
+          <h3>IA Analisa</h3>
           <p>Nossa inteligência artificial transcreve o áudio, identifica alegações factuais e analisa o contexto.</p>
         </div>
 
         <div class="glass-card step-card fade-in-up">
           <div class="step-number">3</div>
-          <h4>Verificação</h4>
+          <h3>Verificação</h3>
           <p>Cada alegação é verificada individualmente com raciocínio detalhado e fontes quando disponíveis.</p>
         </div>
 
         <div class="glass-card step-card fade-in-up">
           <div class="step-number">4</div>
-          <h4>Resultado</h4>
+          <h3>Resultado</h3>
           <p>Receba um score de confiabilidade, veredito claro e relatório completo para compartilhar.</p>
         </div>
       </div>
@@ -234,25 +234,25 @@
       <div class="about-grid">
         <div class="glass-card about-card fade-in-up">
           <div class="about-card__icon">🎯</div>
-          <h4>Nossa Missão</h4>
+          <h3>Nossa Missão</h3>
           <p>Democratizar o acesso a ferramentas de verificação de fatos, capacitando cidadãos brasileiros a identificar desinformação em vídeos políticos e eleitorais com o apoio de inteligência artificial.</p>
         </div>
 
         <div class="glass-card about-card fade-in-up">
           <div class="about-card__icon">🔬</div>
-          <h4>Metodologia</h4>
+          <h3>Metodologia</h3>
           <p>Utilizamos o modelo multimodal Google Gemini 2.0 Flash para transcrever, decompor e verificar cada alegação factual presente no vídeo, confrontando com bases de conhecimento e fontes jornalísticas.</p>
         </div>
 
         <div class="glass-card about-card fade-in-up">
           <div class="about-card__icon">🔒</div>
-          <h4>Privacidade</h4>
-          <p>100% client-side. Sua chave de API, seus vídeos e seu histórico de análises nunca saem do seu navegador. Nenhum dado é enviado para servidores nossos.</p>
+          <h3>Privacidade</h3>
+          <p>100% client-side. Sua chave de API, seus vídeos e seu histórico de análises nunca saem do seu navegador. Nenhum dada é enviado para servidores nossos.</p>
         </div>
 
         <div class="glass-card about-card fade-in-up">
           <div class="about-card__icon">🌐</div>
-          <h4>Open Source</h4>
+          <h3>Open Source</h3>
           <p>Projeto de código aberto no GitHub. Contribuições, auditorias e sugestões da comunidade são bem-vindas para aprimorar a ferramenta continuamente.</p>
         </div>
       </div>

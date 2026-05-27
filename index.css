@@ -1193,7 +1193,7 @@ section {
   color: var(--accent-primary);
 }
 
-.step-card h4 {
+.step-card h3 {
   margin-bottom: var(--space-sm);
   color: var(--text-primary);
 }
@@ -2316,7 +2316,7 @@ section {
   margin-bottom: 16px;
 }
 
-.about-card h4 {
+.about-card h3 {
   font-size: 1.15rem;
   color: var(--text-primary);
   margin-bottom: 10px;

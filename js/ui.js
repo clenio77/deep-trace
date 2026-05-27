@@ -303,7 +303,7 @@ window.DeepTraceUI = class DeepTraceUI {
               ${analysis.overallScore}%
             </span>
           </div>
-          <h4 class="history-card__title">${this._escapeHtml(analysis.title || 'Análise sem título')}</h4>
+          <h3 class="history-card__title">${this._escapeHtml(analysis.title || 'Análise sem título')}</h3>
           <p class="history-card__date">${this._formatDate(analysis.timestamp)}</p>
           <div class="history-card__verdict">${this._getVerdictIcon(analysis.verdict)} ${this._escapeHtml(analysis.verdict || '')}</div>
         </div>
