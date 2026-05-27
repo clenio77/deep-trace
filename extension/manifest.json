@@ -1,0 +1,35 @@
+{
+  "manifest_version": 3,
+  "name": "DeepTrace — Detector de Fake News",
+  "version": "1.0.1",
+  "description": "Analise a credibilidade de vídeos e discursos com inteligência artificial diretamente no seu navegador.",
+  "permissions": [
+    "tabs",
+    "activeTab",
+    "storage"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.youtube.com/watch*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://deep-trace-nine.vercel.app/*",
+        "http://localhost/*"
+      ],
+      "js": [
+        "content_webapp.js"
+      ],
+      "run_at": "document_start"
+    }
+  ]
+}

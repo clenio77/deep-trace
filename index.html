@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="DeepTrace — Detector de Fake News em Vídeos. Use inteligência artificial para verificar a veracidade de vídeos políticos e eleitorais no Brasil.">
+  <meta name="keywords" content="fake news, detector, vídeo, eleições, Brasil, verificação, fact-checking, deepfake, IA">
+  <meta name="author" content="DeepTrace">
+  <meta name="theme-color" content="#060a14">
+
+  <!-- Open Graph / Redes Sociais -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="DeepTrace — Detector de Fake News em Vídeos">
+  <meta property="og:description" content="Inteligência artificial a serviço da democracia brasileira. Verifique vídeos suspeitos em segundos.">
+  <meta property="og:image" content="assets/logo.png">
+
+  <title>DeepTrace — Detector de Fake News em Vídeos</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/logo.png">
+
+  <!-- Estilos -->
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+
+  <!-- ===== Toast Container ===== -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- ===== Header / Navbar ===== -->
+  <header class="header" id="header">
+    <div class="header-inner">
+      <a href="#" class="header-logo" id="logo-link">
+        <img src="assets/logo.png" alt="DeepTrace Logo" width="36" height="36">
+        <span>DeepTrace</span>
+      </a>
+      <nav class="header-nav">
+        <a href="#analyze">Analisar</a>
+        <a href="#history">Histórico</a>
+        <a href="#how-it-works">Como Funciona</a>
+        <button id="settings-btn" title="Configurações" aria-label="Abrir configurações">
+          ⚙️
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ===== Hero Section ===== -->
+  <section class="hero" id="hero">
+    <div class="hero-grid" aria-hidden="true"></div>
+    <div class="hero-content">
+      <img src="assets/logo.png" alt="DeepTrace" class="hero-logo" width="100" height="100">
+
+      <div class="hero-badge">
+        <span class="dot" aria-hidden="true"></span>
+        Powered by Gemini AI
+      </div>
+
+      <h1>Desvende a <span class="text-gradient">verdade</span> por trás dos vídeos</h1>
+
+      <p class="hero-subtitle">
+        Inteligência artificial a serviço da democracia brasileira.
+        Verifique vídeos suspeitos em segundos e combata a desinformação.
+      </p>
+
+      <button class="btn-primary" id="cta-btn">
+        🔍 Analisar Vídeo Agora
+      </button>
+    </div>
+  </section>
+
+  <!-- ===== Seção de Análise ===== -->
+  <section class="analyze-section" id="analyze">
+    <div class="container">
+      <div class="section-title fade-in-up">
+        <h2>Analise um <span class="text-gradient">Vídeo</span></h2>
+        <p>Cole o link do vídeo suspeito ou faça upload de um arquivo para verificação instantânea.</p>
+      </div>
+
+      <div class="analyze-card glass-card-accent fade-in-up">
+        <!-- Input de URL -->
+        <div class="input-group">
+          <input
+            type="url"
+            id="analyze-input"
+            placeholder="Cole o link do vídeo aqui (YouTube, TikTok, Instagram, Twitter...)"
+            autocomplete="off"
+            aria-label="URL do vídeo para análise"
+          >
+          <button class="btn-primary" id="analyze-btn">
+            🔍 Analisar
+          </button>
+        </div>
+
+        <!-- Divisor -->
+        <div class="divider-text">ou</div>
+
+        <!-- Área de Upload -->
+        <div class="upload-area" id="upload-area" role="button" tabindex="0" aria-label="Arraste ou clique para enviar vídeo">
+          <span class="upload-icon" aria-hidden="true">📁</span>
+          <p class="upload-text">
+            Arraste um vídeo aqui ou <strong>clique para enviar</strong>
+          </p>
+          <p class="text-muted" style="font-size: 0.8rem; margin-top: 4px;">Máximo 50MB · MP4, WebM, MOV</p>
+        </div>
+        <input type="file" id="upload-input" accept="video/*" class="hidden" aria-hidden="true">
+
+        <!-- Plataformas suportadas -->
+        <div class="platforms">
+          <span>▶️ YouTube</span>
+          <span>🎵 TikTok</span>
+          <span>📸 Instagram</span>
+          <span>🐦 Twitter/X</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Seção de Resultado ===== -->
+  <section class="result-section" id="result-section">
+    <div class="container">
+      <div class="result-container" id="result-container">
+        <!-- Resultado renderizado dinamicamente via JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Seção de Histórico ===== -->
+  <section class="history-section" id="history">
+    <div class="container">
+      <div class="section-title fade-in-up">
+        <h2>Análises <span class="text-gradient">Recentes</span></h2>
+        <p>Vídeos verificados recentemente. Clique em qualquer card para ver os detalhes.</p>
+      </div>
+
+      <div class="history-grid" id="history-grid">
+        <!-- Cards renderizados via JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Como Funciona ===== -->
+  <section class="how-it-works" id="how-it-works">
+    <div class="container">
+      <div class="section-title fade-in-up">
+        <h2>Como <span class="text-gradient">Funciona</span></h2>
+        <p>Tecnologia de ponta em 4 passos simples</p>
+      </div>
+
+      <div class="steps-grid">
+        <div class="glass-card step-card fade-in-up">
+          <div class="step-number">1</div>
+          <h4>Envie o Vídeo</h4>
+          <p>Cole o link do vídeo ou faça upload diretamente. Suportamos YouTube, TikTok, Instagram e Twitter.</p>
+        </div>
+
+        <div class="glass-card step-card fade-in-up">
+          <div class="step-number">2</div>
+          <h4>IA Analisa</h4>
+          <p>Nossa inteligência artificial transcreve o áudio, identifica alegações factuais e analisa o contexto.</p>
+        </div>
+
+        <div class="glass-card step-card fade-in-up">
+          <div class="step-number">3</div>
+          <h4>Verificação</h4>
+          <p>Cada alegação é verificada individualmente com raciocínio detalhado e fontes quando disponíveis.</p>
+        </div>
+
+        <div class="glass-card step-card fade-in-up">
+          <div class="step-number">4</div>
+          <h4>Resultado</h4>
+          <p>Receba um score de confiabilidade, veredito claro e relatório completo para compartilhar.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Footer ===== -->
+  <footer class="footer" id="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-disclaimer">
+          ⚠️ <strong>Aviso importante:</strong> O DeepTrace é uma ferramenta de apoio à verificação.
+          Os resultados são gerados por inteligência artificial e podem conter imprecisões.
+          Sempre consulte múltiplas fontes antes de tirar conclusões definitivas.
+        </div>
+
+        <div class="footer-links">
+          <a href="#hero">Início</a>
+          <a href="#analyze">Analisar</a>
+          <a href="#how-it-works">Como Funciona</a>
+        </div>
+
+        <p class="footer-copy">
+          © 2026 DeepTrace · Inteligência artificial a serviço da democracia
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ===== Scripts ===== -->
+  <script src="js/storage.js"></script>
+  <script src="js/analyzer.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>

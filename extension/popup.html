@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    /* Estilos do Popup */
+    :root {
+      --bg-primary: #060a14;
+      --bg-secondary: #0a0e1a;
+      --bg-card: rgba(255, 255, 255, 0.02);
+      --accent-primary: #00d4ff;
+      --accent-secondary: #3b82f6;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --border: rgba(255, 255, 255, 0.08);
+      --radius: 8px;
+    }
+    
+    body {
+      width: 320px;
+      margin: 0;
+      padding: 16px;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: system-ui, -apple-system, sans-serif;
+      box-sizing: border-box;
+    }
+    
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .logo-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+      border-radius: 6px;
+      font-weight: 800;
+      font-size: 14px;
+      color: #060a14;
+      box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+    }
+    
+    .title {
+      font-size: 16px;
+      font-weight: 700;
+      margin: 0;
+      background: linear-gradient(90deg, #f1f5f9 0%, #00d4ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .content-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 10px 16px;
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+      color: #060a14;
+      box-shadow: 0 4px 12px rgba(0, 212, 255, 0.2);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(0, 212, 255, 0.3);
+    }
+    
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      margin-top: 10px;
+    }
+    
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+    
+    .status-text {
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--text-secondary);
+      margin-top: 0;
+      margin-bottom: 16px;
+    }
+    
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      text-align: left;
+    }
+    
+    .input-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+    
+    input[type="url"] {
+      width: 100%;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text-primary);
+      font-size: 13px;
+      outline: none;
+      box-sizing: border-box;
+      transition: border-color 0.2s;
+    }
+    
+    input[type="url"]:focus {
+      border-color: var(--accent-primary);
+    }
+    
+    .footer {
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+    
+    .footer a {
+      color: var(--accent-primary);
+      text-decoration: none;
+    }
+    
+    .footer a:hover {
+      text-decoration: underline;
+    }
+    
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="logo-container">D</div>
+    <h1 class="title">DeepTrace</h1>
+  </div>
+
+  <!-- Estado A: Vídeo Detectado -->
+  <div id="video-detected-state" class="content-box hidden">
+    <p class="status-text" id="detected-status-msg">
+      Vídeo compatível detectado na aba ativa!
+    </p>
+    <button class="btn btn-primary" id="analyze-current-btn">
+      🔍 Analisar Vídeo Atual
+    </button>
+  </div>
+
+  <!-- Estado B: Nenhum Vídeo Detectado / Input Manual -->
+  <div id="no-video-state" class="content-box">
+    <div class="input-group">
+      <label class="input-label" for="manual-url">Inserir URL do vídeo:</label>
+      <input type="url" id="manual-url" placeholder="Cole o link do YouTube, TikTok, etc..." autocomplete="off">
+      <button class="btn btn-primary" id="analyze-manual-btn">
+        🔍 Analisar Vídeo
+      </button>
+    </div>
+  </div>
+
+  <div class="footer">
+    <a href="http://localhost:8000" target="_blank" id="open-app-link">Abrir painel completo do DeepTrace</a>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
