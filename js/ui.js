@@ -41,54 +41,146 @@ window.DeepTraceUI = class DeepTraceUI {
     // Limpa qualquer conteúdo anterior
     section.innerHTML = '';
 
-    const mensagens = [
-      'Recebendo vídeo...',
-      'Transcrevendo áudio...',
-      'Analisando alegações...',
-      'Verificando fatos...',
-      'Preparando relatório...'
-    ];
-
-    let indiceMensagem = 0;
-
     const container = document.createElement('div');
     container.className = 'loading-container fade-in-up visible';
+    container.style.cssText = 'max-width: 600px; margin: 0 auto; padding: 40px 24px; text-align: left;';
     container.innerHTML = `
-      <div class="loading-spinner"></div>
-      <p class="loading-text">${mensagens[0]}</p>
-      <div class="loading-shimmer">
-        <div class="shimmer-line"></div>
-        <div class="shimmer-line shimmer-line--short"></div>
-        <div class="shimmer-line shimmer-line--medium"></div>
+      <div class="loading-header" style="text-align: center; margin-bottom: 24px;">
+        <h3 style="font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 6px;">Auditoria de Vídeo em Andamento</h3>
+        <p class="loading-estimate" style="font-size: 0.85rem; color: var(--text-secondary);">
+          Tempo estimado: ~30s | <span style="color: var(--accent-primary);">Decorridos: <span id="loading-timer">0</span>s</span>
+        </p>
+      </div>
+      
+      <div class="loading-progress-bar" style="background: rgba(255,255,255,0.05); height: 6px; border-radius: 3px; overflow: hidden; margin-bottom: 32px;">
+        <div class="loading-progress-fill" id="loading-progress-fill" style="width: 0%; height: 100%; background: var(--accent-gradient); transition: width 0.4s ease;"></div>
+      </div>
+
+      <div class="loading-steps" style="display: flex; flex-direction: column; gap: 20px;">
+        <div class="loading-step active" id="step-metadata" style="display: flex; gap: 16px; align-items: flex-start; opacity: 0.5; transition: opacity 0.3s ease;">
+          <div class="step-icon" style="font-size: 1.2rem; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.05); border-radius: 50%;">⏳</div>
+          <div class="step-details">
+            <h4 style="font-size: 0.95rem; font-weight: 600; color: var(--text-primary); margin: 0 0 2px;">1. Extraindo Metadados & Legendas</h4>
+            <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0;">Lendo informações do vídeo e buscando legendas oficiais/extensão...</p>
+          </div>
+        </div>
+        <div class="loading-step" id="step-transcription" style="display: flex; gap: 16px; align-items: flex-start; opacity: 0.3; transition: opacity 0.3s ease;">
+          <div class="step-icon" style="font-size: 1.2rem; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.05); border-radius: 50%;">⚪</div>
+          <div class="step-details">
+            <h4 style="font-size: 0.95rem; font-weight: 600; color: var(--text-primary); margin: 0 0 2px;">2. Transcrição Multimodal</h4>
+            <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0;">Processando áudio falado e organizando a linha temporal do texto...</p>
+          </div>
+        </div>
+        <div class="loading-step" id="step-verification" style="display: flex; gap: 16px; align-items: flex-start; opacity: 0.3; transition: opacity 0.3s ease;">
+          <div class="step-icon" style="font-size: 1.2rem; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.05); border-radius: 50%;">⚪</div>
+          <div class="step-details">
+            <h4 style="font-size: 0.95rem; font-weight: 600; color: var(--text-primary); margin: 0 0 2px;">3. Auditoria de Fatos & Deepfake</h4>
+            <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0;">Confrontando alegações com base de conhecimento e analisando manipulações na imagem...</p>
+          </div>
+        </div>
+        <div class="loading-step" id="step-report" style="display: flex; gap: 16px; align-items: flex-start; opacity: 0.3; transition: opacity 0.3s ease;">
+          <div class="step-icon" style="font-size: 1.2rem; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.05); border-radius: 50%;">⚪</div>
+          <div class="step-details">
+            <h4 style="font-size: 0.95rem; font-weight: 600; color: var(--text-primary); margin: 0 0 2px;">4. Compilando Relatório de Auditoria</h4>
+            <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0;">Montando scores gerais, vereditos de claims e links de referências...</p>
+          </div>
+        </div>
       </div>
     `;
 
     section.appendChild(container);
 
-    // Mensagens progressivas a cada 3 segundos
-    this._loadingInterval = setInterval(() => {
-      indiceMensagem = (indiceMensagem + 1) % mensagens.length;
-      const textoEl = container.querySelector('.loading-text');
-      if (textoEl) {
-        textoEl.style.opacity = '0';
-        setTimeout(() => {
-          textoEl.textContent = mensagens[indiceMensagem];
-          textoEl.style.opacity = '1';
-        }, 300);
+    // Ajusta opacity da primeira etapa ativa imediatamente
+    document.getElementById('step-metadata').style.opacity = '1';
+
+    let startTime = Date.now();
+    let currentFillWidth = 0;
+
+    const timerEl = document.getElementById('loading-timer');
+    const fillEl = document.getElementById('loading-progress-fill');
+    
+    // Intervalo de cronômetro e simulador de progresso
+    this._loadingTimerInterval = setInterval(() => {
+      const elapsed = Math.round((Date.now() - startTime) / 1000);
+      if (timerEl) {
+        timerEl.textContent = elapsed;
       }
-    }, 3000);
+
+      // Lógica de progressão das etapas e barra de progresso com base no tempo
+      if (elapsed < 3) {
+        // Etapa 1 ativa
+        currentFillWidth = Math.min(15, elapsed * 5);
+      } else if (elapsed === 3) {
+        // Conclui Etapa 1, inicia Etapa 2
+        this._setStepState('step-metadata', 'completed', '✅');
+        this._setStepState('step-transcription', 'active', '⏳');
+        currentFillWidth = 25;
+      } else if (elapsed > 3 && elapsed < 12) {
+        // Etapa 2 ativa (vai até 55%)
+        currentFillWidth = 25 + Math.round(((elapsed - 3) / 9) * 30);
+      } else if (elapsed === 12) {
+        // Conclui Etapa 2, inicia Etapa 3
+        this._setStepState('step-transcription', 'completed', '✅');
+        this._setStepState('step-verification', 'active', '⏳');
+        currentFillWidth = 60;
+      } else if (elapsed > 12 && elapsed < 22) {
+        // Etapa 3 ativa (vai até 85%)
+        currentFillWidth = 60 + Math.round(((elapsed - 12) / 10) * 25);
+      } else if (elapsed === 22) {
+        // Conclui Etapa 3, inicia Etapa 4
+        this._setStepState('step-verification', 'completed', '✅');
+        this._setStepState('step-report', 'active', '⏳');
+        currentFillWidth = 90;
+      } else if (elapsed > 22 && elapsed < 35) {
+        // Etapa 4 ativa (limita em 98%)
+        currentFillWidth = 90 + Math.round(((elapsed - 22) / 13) * 8);
+      } else if (elapsed >= 35) {
+        currentFillWidth = 98;
+      }
+
+      if (fillEl) {
+        fillEl.style.width = currentFillWidth + '%';
+      }
+    }, 1000);
 
     // Scroll suave até a seção
     section.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   /**
-   * Remove o loading e limpa o intervalo de mensagens.
+   * Altera o estado visual de uma etapa do loading.
+   * @private
+   */
+  _setStepState(stepId, state, icon) {
+    const stepEl = document.getElementById(stepId);
+    if (!stepEl) return;
+
+    if (state === 'active') {
+      stepEl.style.opacity = '1';
+      const iconEl = stepEl.querySelector('.step-icon');
+      if (iconEl) {
+        iconEl.textContent = icon;
+        iconEl.style.background = 'rgba(255, 255, 255, 0.05)';
+        iconEl.style.color = 'var(--text-primary)';
+      }
+    } else if (state === 'completed') {
+      stepEl.style.opacity = '0.7';
+      const iconEl = stepEl.querySelector('.step-icon');
+      if (iconEl) {
+        iconEl.textContent = icon;
+        iconEl.style.background = 'var(--success-soft)';
+        iconEl.style.color = 'var(--success)';
+      }
+    }
+  }
+
+  /**
+   * Remove o loading e limpa o intervalo.
    */
   hideLoading() {
-    if (this._loadingInterval) {
-      clearInterval(this._loadingInterval);
-      this._loadingInterval = null;
+    if (this._loadingTimerInterval) {
+      clearInterval(this._loadingTimerInterval);
+      this._loadingTimerInterval = null;
     }
 
     const section = document.getElementById('result-section');
@@ -182,8 +274,15 @@ window.DeepTraceUI = class DeepTraceUI {
 
     if (!analyses || analyses.length === 0) {
       grid.innerHTML = `
-        <div class="history-empty glass-card">
-          <p>Nenhuma análise anterior encontrada.</p>
+        <div class="history-empty glass-card" style="text-align: center; padding: 48px 24px; width: 100%; grid-column: 1 / -1;">
+          <div class="empty-icon" style="font-size: 3rem; margin-bottom: 16px; opacity: 0.7;">📊</div>
+          <p style="font-size: 1.1rem; font-weight: 600; color: var(--text-primary); margin-bottom: 8px;">Nenhuma análise encontrada</p>
+          <p class="empty-subtext" style="font-size: 0.85rem; color: var(--text-muted); max-width: 320px; margin: 0 auto 24px; line-height: 1.5;">
+            Cole um link de vídeo ou envie um arquivo acima para iniciar sua primeira auditoria de desinformação.
+          </p>
+          <a href="#analyze" class="btn-primary" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; padding: 10px 20px; font-size: 0.85rem; border-radius: var(--radius-md); font-weight: 600; margin: 0 auto;">
+            🔍 Analisar Novo Vídeo
+          </a>
         </div>
       `;
       return;
@@ -749,9 +848,14 @@ window.DeepTraceUI = class DeepTraceUI {
           </div>
         </div>
       </div>
-      <button class="btn-reanalyze" id="btn-reanalyze" title="Forçar nova análise ignorando cache">
-        🔄 Re-analisar
-      </button>
+      <div class="result-actions" style="display: flex; gap: 12px; justify-content: center; margin-top: 16px; flex-wrap: wrap;">
+        <button class="btn-reanalyze" id="btn-reanalyze" title="Forçar nova análise ignorando cache" style="margin-top: 0;">
+          🔄 Re-analisar
+        </button>
+        <button class="btn-secondary" id="btn-share-report" title="Compartilhar relatório de auditoria" style="display: inline-flex; align-items: center; gap: 6px; padding: 10px 24px; border-radius: 10px; font-size: 0.9rem; font-weight: 500; cursor: pointer;">
+          🔗 Compartilhar
+        </button>
+      </div>
     `;
 
     // Inicia animações após inserção no DOM

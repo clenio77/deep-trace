@@ -106,7 +106,11 @@ window.DeepTraceApp = class DeepTraceApp {
             resultSection: document.querySelector('#result-section'),
             historyGrid: document.querySelector('#history-grid'),
             settingsBtn: document.querySelector('#settings-btn'),
-            ctaBtn: document.querySelector('#cta-btn')
+            ctaBtn: document.querySelector('#cta-btn'),
+            filterPlatform: document.querySelector('#filter-platform'),
+            filterVerdict: document.querySelector('#filter-verdict'),
+            menuToggle: document.querySelector('#menu-toggle'),
+            headerNav: document.querySelector('#header-nav')
         };
     }
 
@@ -115,7 +119,7 @@ window.DeepTraceApp = class DeepTraceApp {
      * @private
      */
     _registerEventListeners() {
-        const { analyzeInput, analyzeBtn, uploadInput, uploadArea, settingsBtn, ctaBtn } = this.elements;
+        const { analyzeInput, analyzeBtn, uploadInput, uploadArea, settingsBtn, ctaBtn, menuToggle, headerNav, filterPlatform, filterVerdict } = this.elements;
 
         // a) Botão analisar
         if (analyzeBtn) {
@@ -187,6 +191,32 @@ window.DeepTraceApp = class DeepTraceApp {
             });
         }
 
+        // Toggle do Menu Mobile hambúrguer
+        if (menuToggle && headerNav) {
+            menuToggle.addEventListener('click', () => {
+                const isOpen = headerNav.classList.toggle('header-nav--open');
+                menuToggle.setAttribute('aria-expanded', isOpen);
+                menuToggle.classList.toggle('active');
+            });
+
+            // Fecha o menu ao clicar em qualquer link dele
+            headerNav.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    headerNav.classList.remove('header-nav--open');
+                    menuToggle.setAttribute('aria-expanded', 'false');
+                    menuToggle.classList.remove('active');
+                });
+            });
+        }
+
+        // Eventos dos filtros do histórico
+        if (filterPlatform) {
+            filterPlatform.addEventListener('change', () => this.handleFilterHistory());
+        }
+        if (filterVerdict) {
+            filterVerdict.addEventListener('change', () => this.handleFilterHistory());
+        }
+
         // g2) Botão limpar histórico (delegação — renderizado dinamicamente)
         document.addEventListener('click', (e) => {
             if (e.target.closest('#btn-clear-history')) {
@@ -194,6 +224,9 @@ window.DeepTraceApp = class DeepTraceApp {
             }
             if (e.target.closest('#btn-reanalyze')) {
                 this.handleReanalyze();
+            }
+            if (e.target.closest('#btn-share-report')) {
+                this.handleShareReport();
             }
         });
 
@@ -295,7 +328,7 @@ window.DeepTraceApp = class DeepTraceApp {
         const cached = this.storage.getByUrl(url);
         if (cached) {
             this.ui.showToast('Resultado carregado do cache.', 'info');
-            this.ui.showResult(cached);
+            this._showResult(cached);
             this._scrollToResult();
             return;
         }
@@ -313,7 +346,7 @@ window.DeepTraceApp = class DeepTraceApp {
 
             // Persiste e exibe
             this.storage.saveAnalysis(result);
-            this.ui.showResult(result);
+            this._showResult(result);
             this.loadHistory();
             this._updateMetrics();
             this._scrollToResult();
@@ -393,7 +426,7 @@ window.DeepTraceApp = class DeepTraceApp {
 
             // Persiste e exibe
             this.storage.saveAnalysis(result);
-            this.ui.showResult(result);
+            this._showResult(result);
             this.loadHistory();
             this._updateMetrics();
             this._scrollToResult();
@@ -615,8 +648,102 @@ window.DeepTraceApp = class DeepTraceApp {
      * @param {Object} analysis — Dados da análise selecionada
      */
     handleHistoryClick(analysis) {
-        this.ui.showResult(analysis);
+        this._showResult(analysis);
         this._scrollToResult();
+    }
+
+    /**
+     * Exibe o resultado da análise e o armazena como análise ativa.
+     * @private
+     */
+    _showResult(result) {
+        this._activeAnalysis = result;
+        this.ui.showResult(result);
+    }
+
+    /**
+     * Gera e compartilha (ou copia) o relatório resumido da verificação.
+     */
+    async handleShareReport() {
+        if (!this._activeAnalysis) {
+            this.ui.showToast('Nenhum resultado ativo para compartilhar.', 'error');
+            return;
+        }
+
+        const analysis = this._activeAnalysis;
+        const veredito = analysis.verdict || 'Não verificado';
+        const score = analysis.overallScore || 0;
+        const resumo = analysis.summary || '';
+        const urlOriginal = analysis.url || '';
+        
+        // Gera link de compartilhamento do app com query param do vídeo (se houver url original)
+        let linkCompartilhavel = window.location.origin + window.location.pathname;
+        if (urlOriginal) {
+            linkCompartilhavel += '?url=' + encodeURIComponent(urlOriginal);
+        }
+
+        const textoCompartilhar = `🔍 *DeepTrace — Auditoria de Vídeo* \n\n` +
+            `*Veredito:* ${veredito}\n` +
+            `*Score de Confiabilidade:* ${score}%\n` +
+            `*Resumo:* ${resumo}\n\n` +
+            `Verifique a análise detalhada aqui: ${linkCompartilhavel}`;
+
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: `Auditoria de Vídeo — ${veredito}`,
+                    text: textoCompartilhar,
+                    url: linkCompartilhavel
+                });
+                this.ui.showToast('Relatório compartilhado com sucesso!', 'success');
+            } catch (err) {
+                if (err.name !== 'AbortError') {
+                    this._copyTextToClipboard(textoCompartilhar);
+                }
+            }
+        } else {
+            this._copyTextToClipboard(textoCompartilhar);
+        }
+    }
+
+    /**
+     * Copia texto para o clipboard e mostra toast de sucesso.
+     * @private
+     */
+    _copyTextToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            this.ui.showToast('Relatório copiado para a área de transferência!', 'success');
+        }).catch((err) => {
+            console.error('Erro ao copiar texto:', err);
+            this.ui.showToast('Não foi possível copiar o link de compartilhamento.', 'error');
+        });
+    }
+
+    /**
+     * Filtra o histórico de acordo com a rede e o veredito selecionados.
+     */
+    handleFilterHistory() {
+        const platform = this.elements.filterPlatform?.value || 'all';
+        const verdict = this.elements.filterVerdict?.value || 'all';
+        
+        let analyses = this.storage.getHistory();
+        
+        if (platform !== 'all') {
+            analyses = analyses.filter(item => {
+                if (platform === 'file') return !item.url;
+                return (item.platform || '').toLowerCase() === platform;
+            });
+        }
+        
+        if (verdict !== 'all') {
+            analyses = analyses.filter(item => {
+                const v = (item.verdict || '').toLowerCase();
+                if (verdict === 'parcial') return v.includes('parcial');
+                return v.includes(verdict);
+            });
+        }
+        
+        this.ui.renderHistoryCards(analyses);
     }
 
     /**

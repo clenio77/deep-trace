@@ -33,8 +33,8 @@
 
   /* Texto */
   --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --text-muted: #4b5563;
+  --text-secondary: #a1b0c5;
+  --text-muted: #8da2b5;
   --text-accent: #00d4ff;
 
   /* Bordas e efeitos */
@@ -2539,4 +2539,95 @@ section {
   display: flex;
   gap: 12px;
   justify-content: center;
+}
+
+/* ===== Menu Hambúrguer Responsivo ===== */
+.menu-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 24px;
+  height: 18px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 10001;
+}
+
+.menu-toggle span {
+  width: 100%;
+  height: 2px;
+  background-color: var(--text-primary);
+  border-radius: 1px;
+  transition: all 0.3s ease;
+}
+
+/* Animação do botão menu-toggle ativo */
+.menu-toggle.active span:nth-child(1) {
+  transform: translateY(8px) rotate(45deg);
+}
+
+.menu-toggle.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.menu-toggle.active span:nth-child(3) {
+  transform: translateY(-8px) rotate(-45deg);
+}
+
+/* Responsividade do Header e Menu hambúrguer */
+@media (max-width: 768px) {
+  .menu-toggle {
+    display: flex;
+  }
+
+  .nav-label {
+    display: none;
+  }
+
+  .header-nav {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 280px;
+    height: 100vh;
+    background: rgba(13, 18, 32, 0.95);
+    backdrop-filter: var(--glass-blur);
+    border-left: 1px solid var(--glass-border);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    padding: 80px 24px;
+    transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 10000;
+  }
+
+  .header-nav--open {
+    right: 0;
+  }
+
+  /* Faz reaparecer os links em mobile quando a barra está aberta */
+  .header-nav.header-nav--open a {
+    display: block !important;
+    font-size: 1.15rem;
+  }
+  
+  #settings-btn {
+    width: auto;
+    padding: 10px 24px;
+    font-size: 1rem;
+  }
+  
+  .nav-label {
+    display: inline !important;
+  }
+}
+
+/* Ocultação específica do nav-label em telas bem pequenas fora do menu mobile */
+@media (max-width: 576px) {
+  .nav-label {
+    display: none !important;
+  }
 }

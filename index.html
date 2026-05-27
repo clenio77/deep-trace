@@ -36,7 +36,7 @@
         <img src="assets/logo.png" alt="DeepTrace Logo" width="36" height="36">
         <span>DeepTrace</span>
       </a>
-      <nav class="header-nav">
+      <nav class="header-nav" id="header-nav">
         <a href="#analyze">Analisar</a>
         <a href="#history">Histórico</a>
         <a href="#how-it-works">Como Funciona</a>
@@ -46,6 +46,11 @@
           ⚙️ <span class="nav-label">Config</span>
         </button>
       </nav>
+      <button class="menu-toggle" id="menu-toggle" aria-label="Abrir menu de navegação" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
     </div>
   </header>
 
@@ -155,6 +160,25 @@
       <div class="section-title fade-in-up">
         <h2>Análises <span class="text-gradient">Recentes</span></h2>
         <p>Vídeos verificados recentemente. Clique em qualquer card para ver os detalhes.</p>
+      </div>
+
+      <!-- ===== Filtros do Histórico ===== -->
+      <div class="history-filters fade-in-up" style="display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap;">
+        <select id="filter-platform" class="select-filter" style="background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--glass-border); padding: 8px 16px; border-radius: var(--radius-sm); outline: none; cursor: pointer; font-size: 0.85rem;">
+          <option value="all">Todas as Redes</option>
+          <option value="youtube">YouTube</option>
+          <option value="tiktok">TikTok</option>
+          <option value="instagram">Instagram</option>
+          <option value="twitter">Twitter/X</option>
+          <option value="file">Arquivos Locais</option>
+        </select>
+        <select id="filter-verdict" class="select-filter" style="background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--glass-border); padding: 8px 16px; border-radius: var(--radius-sm); outline: none; cursor: pointer; font-size: 0.85rem;">
+          <option value="all">Todos os Vereditos</option>
+          <option value="verdadeiro">Verdadeiro</option>
+          <option value="falso">Falso</option>
+          <option value="parcial">Parcialmente Verdadeiro</option>
+          <option value="inconclusivo">Inconclusivo</option>
+        </select>
       </div>
 
       <div class="history-grid" id="history-grid">

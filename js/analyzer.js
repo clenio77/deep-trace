@@ -239,9 +239,10 @@ ${videoContext}
    - 61–80: Maioria das alegações é verdadeira com ressalvas
    - 81–100: Conteúdo predominantemente verdadeiro e confiável
 
-6. **Veredito final**: Escolha entre: "Falso", "Parcialmente Verdadeiro", "Verdadeiro" ou "Inconclusivo".
+6. **Veredito final**: Escolha entre: "Falso", "Parcialmente Verdadeiro", "Verdadeiro" ou "Inconclusivo". 
+   - **Nota sobre Inconclusivo (e Score Neutro 50%)**: Se você escolher "Inconclusivo" ou atribuir um score de confiabilidade geral de 50%, você DEVE obrigatoriamente explicar detalhadamente no campo "summary" (resumo) e na justificativa ("reasoning") das alegações o motivo técnico/factual dessa inconclusão (ex: ausência completa de áudio falado no vídeo, falta de legendas fornecidas, ou extrema escassez de dados factuais verificáveis no link fornecido). Evite respostas evasivas ou genéricas sem essa justificativa.
 
-7. **Resumo**: Forneça um resumo de 2 a 3 frases descrevendo a conclusão geral da análise.
+7. **Resumo**: Forneça um resumo de 2 a 3 frases descrevendo a conclusão geral da análise. Se inconclusivo, inclua a explicação e os dados faltantes que impossibilitaram a auditoria.
 
 ${deepfakeInstructions}
 
@@ -453,6 +454,7 @@ Responda SOMENTE o JSON. Nenhum texto antes ou depois.`;
    */
   _normalizeAnalysis(data, context) {
     return {
+      title: data.metadata?.videoTitle || context.videoTitle || 'Análise de Vídeo',
       overallScore: this._clampScore(data.overallScore),
       verdict: this._normalizeVerdict(data.verdict),
       summary: data.summary || 'Resumo não disponível.',

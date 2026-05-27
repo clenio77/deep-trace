@@ -62,7 +62,7 @@ window.DeepTraceStorage = class DeepTraceStorage {
             id: analysis.id || this._generateId(),
             url: analysis.url,
             platform: analysis.platform || 'unknown',
-            title: analysis.title || 'Sem título',
+            title: analysis.title || analysis.metadata?.videoTitle || 'Sem título',
             overallScore: analysis.overallScore,
             verdict: analysis.verdict,
             summary: analysis.summary || '',
