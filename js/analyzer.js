@@ -67,7 +67,7 @@ window.DeepTraceAnalyzer = class DeepTraceAnalyzer {
         : `Nota: Não há transcrição local fornecida. Avalie o link de acordo com o seu conhecimento prévio sobre o vídeo/assunto.`
     ].filter(Boolean).join('\n');
 
-    const prompt = this._buildAnalysisPrompt(videoContext, false);
+    const prompt = this._buildAnalysisPrompt(videoContext);
 
     // Corpo da requisição — somente texto (MVP por URL)
     const requestBody = {
@@ -75,6 +75,11 @@ window.DeepTraceAnalyzer = class DeepTraceAnalyzer {
         {
           parts: [{ text: prompt }],
         },
+      ],
+      tools: [
+        {
+          google_search: {}
+        }
       ],
       generationConfig: {
         temperature: 0.2,
@@ -130,7 +135,7 @@ window.DeepTraceAnalyzer = class DeepTraceAnalyzer {
       `Tamanho: ${(file.size / (1024 * 1024)).toFixed(2)} MB`,
     ].join('\n');
 
-    const prompt = this._buildAnalysisPrompt(videoContext, true);
+    const prompt = this._buildAnalysisPrompt(videoContext);
 
     // Corpo da requisição — vídeo inline + prompt textual
     const requestBody = {
@@ -146,6 +151,11 @@ window.DeepTraceAnalyzer = class DeepTraceAnalyzer {
             { text: prompt },
           ],
         },
+      ],
+      tools: [
+        {
+          google_search: {}
+        }
       ],
       generationConfig: {
         temperature: 0.2,
@@ -172,22 +182,7 @@ window.DeepTraceAnalyzer = class DeepTraceAnalyzer {
    * @returns {string} Prompt completo
    * @private
    */
-  _buildAnalysisPrompt(videoContext, isFileUpload = false) {
-    const deepfakeInstructions = isFileUpload
-      ? `8. **Análise Forense de Deepfake / IA Generativa** (OBRIGATÓRIA para vídeos enviados):
-   Analise CUIDADOSAMENTE os frames visuais e o áudio do vídeo enviado para detectar sinais de manipulação por IA (deepfake, face swap, voz sintética, lip sync artificial). Avalie os seguintes indicadores:
-   - **Sincronia Labial (lipSync)**: Os movimentos labiais estão perfeitamente sincronizados com o áudio? Há atrasos, desalinhamentos ou movimentos mecânicos?
-   - **Textura e Bordas Faciais (faceArtifacts)**: Existem artefatos visuais no rosto? Bordas borradas entre o rosto e o fundo? Textura de pele inconsistente? Distorções em dentes, olhos ou cabelo?
-   - **Coerência de Iluminação (lightingCoherence)**: A iluminação no rosto é consistente com o ambiente ao redor? Há sombras impossíveis, reflexos faltando ou iluminação que muda abruptamente?
-   - **Padrão de Piscadas (blinkingPattern)**: As piscadas são naturais? São muito raras, muito frequentes ou ausentes? Padrões regulares demais podem indicar IA.
-   - Forneça um parecer técnico detalhado explicando sua conclusão e o nível de confiança.`
-      : `8. **Análise Forense de Deepfake / IA Generativa** (análise limitada por URL):
-   Com base no seu conhecimento prévio sobre este vídeo ou conteúdo similar, avalie se há indícios de que o vídeo possa conter:
-   - Faces geradas ou manipuladas por IA (deepfake, face swap)
-   - Áudio sintético ou clonado por IA
-   - Manipulação visual evidente
-   NOTA: Como você está recebendo apenas a URL (sem acesso direto ao vídeo), indique na confiança que a análise visual é limitada. Se não puder avaliar, defina detected como false e confidence como 0, e explique a limitação no campo details.`;
-
+  _buildAnalysisPrompt(videoContext) {
     const dataAtual = new Date();
     const dataFormatada = dataAtual.toLocaleDateString('pt-BR', {
       weekday: 'long',
@@ -196,55 +191,50 @@ window.DeepTraceAnalyzer = class DeepTraceAnalyzer {
       day: 'numeric'
     });
 
-    return `Você é o DeepTrace, um sistema avançado de verificação de fatos, detecção de desinformação e análise forense de deepfake em vídeos.
+    return `Você é o DeepTrace, um sistema avançado de investigação de desinformação e análise contextual de vídeos virais.
 
-Analise o vídeo descrito/fornecido abaixo com rigor jornalístico e científico.
+Sua tarefa é analisar o vídeo descrito/fornecido abaixo com rigor jornalístico, decompondo-o em uma linha do tempo de alegações (claims) verificáveis e checando o contexto real das informações.
 
 ─── REFERÊNCIA TEMPORAL ───
 Data e hora da análise (dia de hoje): ${dataFormatada}
-Use esta data de hoje como referência absoluta de tempo para qualquer verificação temporal de fatos.
-Se um fato ou relatório se refere a um ano anterior a ${dataAtual.getFullYear()} (como 2024 ou 2025), note que esse ano já passou e pertence ao passado.
+Use o dia de hoje como referência absoluta de tempo para qualquer verificação temporal de fatos.
+Se um fato ou relatório se refere a um ano anterior a ${dataAtual.getFullYear()} (como 2024 ou 2025), note que esse ano já passou e pertence ao passado. A reutilização de notícias antigas como se fossem atuais é uma tática comum de desinformação.
 
 ─── CONTEXTO DO VÍDEO ───
 ${videoContext}
 
 ─── INSTRUÇÕES DE ANÁLISE ───
 
-1. **Transcrição**: Transcreva integralmente todo o conteúdo falado no vídeo (áudio). Se o vídeo contiver texto na tela, inclua-o também.
+1. **Transcrição**: Transcreva integralmente o áudio falado no vídeo. Se o vídeo contiver texto na tela, manchetes ou banners importantes, transcreva-os e incorpore ao contexto.
 
-2. **Identificação de alegações**: Liste TODAS as alegações factuais feitas no vídeo — afirmações que podem ser verificadas como verdadeiras ou falsas. Inclua alegações explícitas e implícitas.
+2. **Identificação de alegações com Linha do Tempo (Claims & Timestamps)**: 
+   Identifique e liste as principais alegações factuais feitas no vídeo.
+   Para cada alegação, identifique o momento exato ou aproximado em que ela é feita ou exibida na tela. Insira esse momento no formato de marca temporal MM:SS (ex: "00:14", "01:32"). Se o vídeo não contiver marcações de tempo explícitas, faça uma estimativa lógica baseada no fluxo da narrativa ou na transcrição.
 
-3. **Verificação individual**: Para CADA alegação identificada, forneça:
-   - O texto exato da alegação
-   - Um veredito: "Verdadeiro", "Falso", "Parcialmente Verdadeiro" ou "Inconclusivo"
-   - Um score de confiança de 0 a 100 (onde 0 = certeza de ser falso, 100 = certeza de ser verdadeiro)
-   - Uma explicação detalhada do seu raciocínio
-   - Fontes confiáveis que sustentam sua avaliação (quando disponíveis)
+3. **Verificação Individual de Contexto**:
+   Para CADA alegação na linha do tempo, realize uma investigação detalhada utilizando a busca na web:
+   - Identifique inconsistências, ausência de evidências ou dados inventados.
+   - Verifique se há descontextualização de datas ou eventos (ex: vídeo antigo reciclado).
+   - Indique se estatísticas e números apresentados divergem das fontes oficiais ou dados consolidados.
+   - Forneça uma explicação investigativa rica e cite fontes e checagens confiáveis (notícias, sites oficiais, agências de checagem).
 
-4. **Técnicas de manipulação**: Identifique quaisquer técnicas de manipulação ou persuasão usadas, incluindo mas não se limitando a:
-   - Apelo emocional excessivo
-   - Descontextualização de fatos
-   - Dados falsos ou distorcidos
-   - Edição tendenciosa (cortes seletivos, justaposição enganosa)
-   - Uso de autoridade falsa ou enganosa
-   - Teoria conspiratória
-   - Generalização indevida
-   - Falsa equivalência
-   - Omissão deliberada de informações
+4. **Técnicas de manipulação**: Identifique quaisquer técnicas de persuasão ou manipulação usadas no vídeo, tais como:
+   - Descontextualização temporal ou reciclagem de conteúdo
+   - Edição tendenciosa ou corte manipulativo (omissão de partes essenciais)
+   - Cherry-picking (dados selecionados a dedo omitindo o panorama completo)
+   - Estatística inventada ou sem fonte comprovada
+   - Apelo emocional excessivo / alarmismo
+   - Falsa equivalência ou generalização indevida
 
 5. **Score geral de confiabilidade**: Atribua um score de 0 a 100, onde:
-   - 0–20: Conteúdo predominantemente falso / desinformação
-   - 21–40: Maioria das alegações é falsa ou distorcida
-   - 41–60: Mistura de informações verdadeiras e falsas
-   - 61–80: Maioria das alegações é verdadeira com ressalvas
-   - 81–100: Conteúdo predominantemente verdadeiro e confiável
+   - 0–30: Conteúdo com desinformação contextual severa, dados falsos ou vídeo reciclado de forma enganosa.
+   - 31–60: Impreciso, com mistura de fatos reais e omissão de contexto importante, ou dados distorcidos.
+   - 61–100: Conteúdo majoritariamente verdadeiro, confiável e coerente temporalmente.
 
 6. **Veredito final**: Escolha entre: "Falso", "Parcialmente Verdadeiro", "Verdadeiro" ou "Inconclusivo". 
-   - **Nota sobre Inconclusivo (e Score Neutro 50%)**: Se você escolher "Inconclusivo" ou atribuir um score de confiabilidade geral de 50%, você DEVE obrigatoriamente explicar detalhadamente no campo "summary" (resumo) e na justificativa ("reasoning") das alegações o motivo técnico/factual dessa inconclusão (ex: ausência completa de áudio falado no vídeo, falta de legendas fornecidas, ou extrema escassez de dados factuais verificáveis no link fornecido). Evite respostas evasivas ou genéricas sem essa justificativa.
+   Se o score for muito baixo ou se houver graves distorções de contexto, use "Falso" ou "Parcialmente Verdadeiro". Se não houver dados factuais suficientes para verificar, classifique como "Inconclusivo" e justifique detalhadamente no sumário.
 
-7. **Resumo**: Forneça um resumo de 2 a 3 frases descrevendo a conclusão geral da análise. Se inconclusivo, inclua a explicação e os dados faltantes que impossibilitaram a auditoria.
-
-${deepfakeInstructions}
+7. **Resumo**: Apresente um resumo executivo de 2 a 3 frases sintetizando os principais achados e alertando para o que está fora de contexto.
 
 ─── FORMATO DE RESPOSTA ───
 
@@ -253,19 +243,11 @@ IMPORTANTE: Responda APENAS com um objeto JSON válido, sem texto adicional, sem
 {
   "overallScore": <número de 0 a 100>,
   "verdict": "<Falso | Parcialmente Verdadeiro | Verdadeiro | Inconclusivo>",
-  "summary": "<Resumo em 2-3 frases>",
-  "deepfakeAnalysis": {
-    "detected": <true se há indícios de deepfake/IA, false caso contrário>,
-    "confidence": <número de 0 a 100 indicando certeza do diagnóstico>,
-    "lipSync": "<Descrição da análise de sincronia labial>",
-    "faceArtifacts": "<Descrição de artefatos faciais encontrados>",
-    "lightingCoherence": "<Descrição da coerência de iluminação>",
-    "blinkingPattern": "<Descrição do padrão de piscadas>",
-    "details": "<Parecer técnico detalhado sobre a autenticidade do vídeo>"
-  },
+  "summary": "<Resumo executivo em 2-3 frases>",
   "claims": [
     {
-      "claim": "<Texto da alegação>",
+      "timestamp": "<Marca temporal em formato MM:SS, ex: 00:14>",
+      "claim": "<Texto curto da alegação factual feita>",
       "verdict": "<Verdadeiro | Falso | Parcialmente Verdadeiro | Inconclusivo>",
       "confidence": <número de 0 a 100>,
       "reasoning": "<Explicação detalhada>",
@@ -458,17 +440,9 @@ Responda SOMENTE o JSON. Nenhum texto antes ou depois.`;
       overallScore: this._clampScore(data.overallScore),
       verdict: this._normalizeVerdict(data.verdict),
       summary: data.summary || 'Resumo não disponível.',
-      deepfakeAnalysis: {
-        detected: !!data.deepfakeAnalysis?.detected,
-        confidence: this._clampScore(data.deepfakeAnalysis?.confidence != null ? data.deepfakeAnalysis.confidence : 0),
-        lipSync: data.deepfakeAnalysis?.lipSync || 'Não avaliado.',
-        faceArtifacts: data.deepfakeAnalysis?.faceArtifacts || 'Não avaliado.',
-        lightingCoherence: data.deepfakeAnalysis?.lightingCoherence || 'Não avaliado.',
-        blinkingPattern: data.deepfakeAnalysis?.blinkingPattern || 'Não avaliado.',
-        details: data.deepfakeAnalysis?.details || 'Nenhum indício óbvio de manipulação visual por IA detectado.'
-      },
       claims: Array.isArray(data.claims)
         ? data.claims.map((c) => ({
+            timestamp: c.timestamp || '00:00',
             claim: c.claim || 'Alegação não especificada',
             verdict: this._normalizeVerdict(c.verdict),
             confidence: this._clampScore(c.confidence),
@@ -490,7 +464,7 @@ Responda SOMENTE o JSON. Nenhum texto antes ou depois.`;
         analyzedAt: new Date().toISOString(),
         platform: context.platform || 'unknown',
         sourceUrl: context.url || null,
-        engineVersion: '1.1.0',
+        engineVersion: '1.2.0',
       },
     };
   }

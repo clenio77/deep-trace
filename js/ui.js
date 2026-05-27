@@ -217,11 +217,8 @@ window.DeepTraceUI = class DeepTraceUI {
     // ── CAMADA 1: Score ──
     wrapper.appendChild(this._renderScoreLayer(analysis));
 
-    // ── CAMADA FORENSE: Laudo de Deepfake ──
-    wrapper.appendChild(this._renderDeepfakeAnalysisLayer(analysis.deepfakeAnalysis, analysis.platform));
-
-    // ── CAMADA 2: Alegações ──
-    wrapper.appendChild(this._renderClaimsLayer(analysis.claims));
+    // ── CAMADA 2: Linha do Tempo Contextual (Claims Ordenados) ──
+    wrapper.appendChild(this._renderTimelineLayer(analysis.claims));
 
     // ── CAMADA 3: Manipulação ──
     wrapper.appendChild(this._renderManipulationLayer(analysis.manipulationTechniques));
@@ -874,166 +871,46 @@ window.DeepTraceUI = class DeepTraceUI {
   }
 
   /**
-   * Renderiza a camada forense de análise de deepfake / geração por IA.
-   * 
-   * @param {Object} deepfakeData — Dados de análise de deepfake
-   * @param {string} platform — Origem do vídeo ('upload', 'youtube', etc.)
-   * @returns {HTMLElement} — Elemento da camada
-   */
-  _renderDeepfakeAnalysisLayer(deepfakeData, platform = '') {
-    const layer = document.createElement('div');
-    layer.className = 'result-layer result-layer--forensic glass-card';
-
-    // Valores padrão se ausentes
-    const data = deepfakeData || {
-      detected: false,
-      confidence: 0,
-      lipSync: 'Não avaliado',
-      faceArtifacts: 'Não avaliado',
-      lightingCoherence: 'Não avaliado',
-      blinkingPattern: 'Não avaliado',
-      details: 'Não foi possível processar a análise forense de deepfake.'
-    };
-
-    const detectado = !!data.detected;
-    const corDetecao = detectado ? 'var(--danger)' : 'var(--success)';
-    const badgeTexto = detectado ? '⚠️ ALTO RISCO DE DEEPFAKE / IA' : '✅ BAIXO RISCO / SEM INDÍCIOS DE IA';
-    const badgeClasse = detectado ? 'forensic-status--danger' : 'forensic-status--success';
-
-    // Determina a cor dos badges dos indicadores
-    const getIndicatorClass = (text) => {
-        const t = (text || '').toLowerCase();
-        if (t.includes('inconsistente') || t.includes('ruim') || t.includes('anormal')) return 'status-badge--danger';
-        if (t.includes('suspeito') || t.includes('parcial') || t.includes('atraso')) return 'status-badge--warning';
-        return 'status-badge--success';
-    };
-
-    // Extrai a primeira palavra do status para o badge
-    const getFirstWord = (text) => {
-        return (text || '').split(' ')[0].replace(/[^a-zA-ZáéíóúâêôãõçÀÉÍÓÚÂÊÔÃÕÇ]/g, '');
-    };
-
-    layer.innerHTML = `
-      <div class="expandable-header" role="button" tabindex="0" aria-expanded="false">
-        <h3 class="section-title">🔬 Laudo Forense de Inteligência Artificial (Deepfake)</h3>
-        <span class="expandable-chevron">▼</span>
-      </div>
-      <div class="expandable-content" aria-hidden="true">
-        ${platform !== 'upload' ? `
-        <div class="forensic-notice-box" style="margin-bottom: 20px; padding: 12px 16px; border-radius: 8px; background: rgba(6, 182, 212, 0.08); border: 1px solid rgba(6, 182, 212, 0.2); display: flex; align-items: flex-start; gap: 12px;">
-          <span style="font-size: 1.25rem; line-height: 1;">ℹ️</span>
-          <p style="margin: 0; font-size: 0.85rem; color: #a5f3fc; line-height: 1.45; text-align: left;">
-            <strong>Análise Forense Visual Limitada</strong>: Como a verificação foi iniciada por link (URL), o modelo de IA não tem acesso direto aos frames do vídeo para analisar elementos visuais (movimentos faciais, compressão, piscadas). Para obter um laudo completo desses indicadores, faça o <strong>upload direto do arquivo do vídeo (.mp4, .webm)</strong>.
-          </p>
-        </div>
-        ` : ''}
-        <div class="forensic-summary-box">
-          <div class="forensic-badge ${badgeClasse}">
-            ${badgeTexto}
-          </div>
-          
-          <div class="forensic-confidence">
-            <div class="confidence-info">
-              <span>Certeza do diagnóstico de IA:</span>
-              <strong style="color: ${corDetecao};">${data.confidence}%</strong>
-            </div>
-            <div class="forensic-progress-bar">
-              <div class="forensic-progress-fill" style="width: ${data.confidence}%; background-color: ${corDetecao};"></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="forensic-indicators-grid">
-          <div class="indicator-card">
-            <div class="indicator-header">
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <span class="indicator-icon">👄</span>
-                <span class="indicator-name">Sincronia Labial</span>
-              </div>
-              <span class="indicator-status-badge ${getIndicatorClass(data.lipSync)}">
-                ${getFirstWord(data.lipSync)}
-              </span>
-            </div>
-            <p class="indicator-desc">${this._escapeHtml(data.lipSync)}</p>
-          </div>
-
-          <div class="indicator-card">
-            <div class="indicator-header">
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <span class="indicator-icon">👤</span>
-                <span class="indicator-name">Textura e Bordas Faciais</span>
-              </div>
-              <span class="indicator-status-badge ${getIndicatorClass(data.faceArtifacts)}">
-                ${getFirstWord(data.faceArtifacts)}
-              </span>
-            </div>
-            <p class="indicator-desc">${this._escapeHtml(data.faceArtifacts)}</p>
-          </div>
-
-          <div class="indicator-card">
-            <div class="indicator-header">
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <span class="indicator-icon">☀️</span>
-                <span class="indicator-name">Coerência de Luz</span>
-              </div>
-              <span class="indicator-status-badge ${getIndicatorClass(data.lightingCoherence)}">
-                ${getFirstWord(data.lightingCoherence)}
-              </span>
-            </div>
-            <p class="indicator-desc">${this._escapeHtml(data.lightingCoherence)}</p>
-          </div>
-
-          <div class="indicator-card">
-            <div class="indicator-header">
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <span class="indicator-icon">👁️</span>
-                <span class="indicator-name">Padrão de Piscadas</span>
-              </div>
-              <span class="indicator-status-badge ${getIndicatorClass(data.blinkingPattern)}">
-                ${getFirstWord(data.blinkingPattern)}
-              </span>
-            </div>
-            <p class="indicator-desc">${this._escapeHtml(data.blinkingPattern)}</p>
-          </div>
-        </div>
-
-        <div class="forensic-details-box">
-          <p class="forensic-details-title">Parecer Técnico Detalhado:</p>
-          <p class="forensic-details-text">${this._escapeHtml(data.details)}</p>
-        </div>
-      </div>
-    `;
-
-    this._setupExpandable(layer);
-    return layer;
-  }
-
-  /**
-   * Renderiza a CAMADA 2 — Alegações verificadas.
+   * Renderiza a CAMADA 2 — Linha do Tempo Contextual com os claims ordenados cronologicamente.
    * 
    * @param {Array} claims — Lista de alegações
    * @returns {HTMLElement} — Elemento da camada
    */
-  _renderClaimsLayer(claims) {
+  _renderTimelineLayer(claims) {
     const layer = document.createElement('div');
-    layer.className = 'result-layer result-layer--claims glass-card';
+    layer.className = 'result-layer result-layer--timeline glass-card';
 
     const temClaims = claims && claims.length > 0;
 
+    // Helper para converter timestamp MM:SS para segundos
+    const parseTime = (ts) => {
+      if (!ts || typeof ts !== 'string') return 0;
+      const parts = ts.split(':').map(Number);
+      if (parts.length === 2) return parts[0] * 60 + parts[1];
+      return 0;
+    };
+
+    // Ordena os claims cronologicamente
+    const sortedClaims = temClaims 
+      ? [...claims].sort((a, b) => parseTime(a.timestamp) - parseTime(b.timestamp))
+      : [];
+
     layer.innerHTML = `
-      <div class="expandable-header" role="button" tabindex="0" aria-expanded="false">
-        <h3 class="section-title">📋 Alegações Verificadas ${temClaims ? `(${claims.length})` : ''}</h3>
-        <span class="expandable-chevron">▼</span>
+      <div class="expandable-header" role="button" tabindex="0" aria-expanded="true">
+        <h3 class="section-title">⏱️ Linha do Tempo de Investigação Contextual ${temClaims ? `(${claims.length})` : ''}</h3>
+        <span class="expandable-chevron" style="transform: rotate(180deg);">▼</span>
       </div>
-      <div class="expandable-content" aria-hidden="true">
+      <div class="expandable-content" aria-hidden="false" style="max-height: none; opacity: 1;">
         ${temClaims ? `
-          <div class="claims-help-box">
-            <p class="claims-help-text">
-              📌 <strong>Como ler esta seção:</strong> Nossa IA analisou o vídeo e separou as principais afirmações feitas. O percentual (%) indica a <strong>certeza da IA</strong> (de 0 a 100%) sobre a veracidade de cada alegação específica com base em fatos e fontes jornalísticas conhecidas.
+          <div class="timeline-help-box">
+            <p class="timeline-help-text">
+              📌 <strong>Entenda a Timeline:</strong> Abaixo estão as alegações (claims) extraídas do áudio e texto do vídeo ordenadas cronologicamente. Cada ponto na linha do tempo exibe o veredito contextual e as fontes coletadas na busca automática da IA.
             </p>
           </div>
-          ${this._renderClaimCards(claims)}
-        ` : '<p class="no-data">Nenhuma alegação identificada.</p>'}
+          <div class="timeline-container">
+            ${this._renderTimelineItems(sortedClaims)}
+          </div>
+        ` : '<p class="no-data">Nenhuma alegação ou ponto temporal identificado.</p>'}
       </div>
     `;
 
@@ -1042,61 +919,79 @@ window.DeepTraceUI = class DeepTraceUI {
   }
 
   /**
-   * Renderiza os cards individuais de alegações.
+   * Renderiza os itens individuais da linha do tempo.
    * 
-   * @param {Array} claims — Lista de alegações
-   * @returns {string} — HTML dos cards
+   * @param {Array} claims — Lista ordenada de alegações
+   * @returns {string} — HTML dos itens
    */
-  _renderClaimCards(claims) {
+  _renderTimelineItems(claims) {
     return claims.map((claim, index) => {
       const confianca = claim.confidence != null ? claim.confidence : 50;
       const cor = this._getScoreColor(confianca);
       const veredito = (claim.verdict || '').toLowerCase();
 
-      let icone = '❓';
-      let iconeClasse = 'claim-icon--unknown';
+      let badgeIcon = '🔍';
+      let statusClasse = 'timeline-status--unknown';
 
       if (veredito.includes('verdadeir') || veredito === 'true') {
-        icone = '✓';
-        iconeClasse = 'claim-icon--true';
+        badgeIcon = '✅';
+        statusClasse = 'timeline-status--true';
       } else if (veredito.includes('fals') || veredito === 'false') {
-        icone = '✗';
-        iconeClasse = 'claim-icon--false';
+        badgeIcon = '🚫';
+        statusClasse = 'timeline-status--false';
       } else if (veredito.includes('parcial')) {
-        icone = '⚠';
-        iconeClasse = 'claim-icon--warning';
+        badgeIcon = '⚠️';
+        statusClasse = 'timeline-status--warning';
       }
 
+      const timestamp = claim.timestamp || '00:00';
       const textoAlegacao = claim.claim || claim.text || 'Alegação não especificada';
       const raciocinio = claim.reasoning || '';
       const fontes = Array.isArray(claim.sources) ? claim.sources : (claim.source ? [claim.source] : []);
 
-      return `
-        <div class="claim-card" style="animation-delay: ${index * 0.1}s;">
-          <div class="claim-card__header">
-            <span class="claim-card__icon ${iconeClasse}">${icone}</span>
-            <span class="claim-card__text">${this._escapeHtml(textoAlegacao)}</span>
-            <span class="claim-card__score badge" style="background: ${cor}22; color: ${cor}; border: 1px solid ${cor}44;">
-              ${confianca}%
-            </span>
-          </div>
-          ${raciocinio ? `
-            <div class="claim-card__reasoning">
-              <div class="expandable-header expandable-header--mini" role="button" tabindex="0" aria-expanded="false">
-                <span>Ver raciocínio</span>
-                <span class="expandable-chevron expandable-chevron--mini">▼</span>
-              </div>
-              <div class="expandable-content expandable-content--mini" aria-hidden="true">
-                <p>${this._escapeHtml(raciocinio)}</p>
-                ${fontes.length > 0 ? `
-                  <div class="claim-sources" style="margin-top: 8px;">
-                    <strong style="font-size: 0.8rem; color: var(--text-muted);">Fontes:</strong>
-                    ${fontes.map(f => `<span class="badge badge-info" style="margin-left: 4px; font-size: 0.75rem;">${this._escapeHtml(f)}</span>`).join('')}
-                  </div>
-                ` : ''}
-              </div>
+      // Formata fontes para links se forem URLs reais, senão exibe como texto
+      const renderFontes = (fontesList) => {
+        if (!fontesList || fontesList.length === 0) return '';
+        return `
+          <div class="timeline-item__sources">
+            <strong>Evidências & Checagens:</strong>
+            <div class="sources-links">
+              ${fontesList.map(f => {
+                const isUrl = f.startsWith('http://') || f.startsWith('https://');
+                if (isUrl) {
+                  try {
+                    const hostname = new URL(f).hostname.replace('www.', '');
+                    return `<a href="${f}" target="_blank" rel="noopener noreferrer" class="source-link-pill">🔗 ${hostname}</a>`;
+                  } catch {
+                    return `<a href="${f}" target="_blank" rel="noopener noreferrer" class="source-link-pill">🔗 Link</a>`;
+                  }
+                }
+                return `<span class="source-text-pill">📄 ${this._escapeHtml(f)}</span>`;
+              }).join('')}
             </div>
-          ` : ''}
+          </div>
+        `;
+      };
+
+      return `
+        <div class="timeline-item" style="animation-delay: ${index * 0.1}s;">
+          <div class="timeline-item__marker" style="border-color: ${cor}; background-color: var(--bg-primary);">
+            <div class="marker-dot" style="background-color: ${cor};"></div>
+          </div>
+          <div class="timeline-item__time-badge">${this._escapeHtml(timestamp)}</div>
+          <div class="timeline-item__content glass-card">
+            <div class="timeline-item__header">
+              <span class="timeline-verdict-badge ${statusClasse}">
+                ${badgeIcon} ${claim.verdict || 'Inconclusivo'}
+              </span>
+              <span class="timeline-confidence-badge" style="color: ${cor}; background: ${cor}12; border: 1px solid ${cor}28;">
+                Confiabilidade: ${confianca}%
+              </span>
+            </div>
+            <h4 class="timeline-item__title">${this._escapeHtml(textoAlegacao)}</h4>
+            <p class="timeline-item__reasoning">${this._escapeHtml(raciocinio)}</p>
+            ${renderFontes(fontes)}
+          </div>
         </div>
       `;
     }).join('');
@@ -1269,5 +1164,319 @@ window.DeepTraceUI = class DeepTraceUI {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+  }
+
+  /**
+   * Exibe o modal premium de compartilhamento nas redes sociais.
+   * 
+   * @param {Object} analysis — Objeto de análise ativo
+   * @param {string} link — Link de compartilhamento da análise
+   * @param {string} text — Texto resumido formatado para compartilhamento
+   */
+  showShareModal(analysis, link, text) {
+    // Remove modal existente, se houver
+    const existente = document.querySelector('.share-modal-overlay');
+    if (existente) existente.remove();
+
+    const overlay = document.createElement('div');
+    overlay.className = 'share-modal-overlay';
+
+    const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+    const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+    const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`;
+
+    overlay.innerHTML = `
+      <div class="share-modal">
+        <h3 style="margin-top: 0; font-size: 1.25rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px;">
+          📢 Compartilhar Investigação
+        </h3>
+        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: var(--space-md); line-height: 1.5;">
+          Gere e baixe o card de investigação em imagem para Instagram/TikTok ou compartilhe o link diretamente.
+        </p>
+
+        <div class="share-card-preview-container">
+          <canvas id="share-card-canvas" width="600" height="600" class="share-card-canvas"></canvas>
+          <button id="btn-download-card" class="btn-secondary" style="font-size: 0.8rem; padding: 8px 16px; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.04); color: #fff; cursor: pointer; margin-top: 10px; width: 100%; justify-content: center;">
+            📥 Baixar Card PNG (Stories/Posts)
+          </button>
+        </div>
+
+        <div class="share-buttons-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: var(--space-md);">
+          <a href="${whatsappUrl}" target="_blank" rel="noopener noreferrer" class="share-btn share-whatsapp">
+            🟢 WhatsApp
+          </a>
+          <a href="${xUrl}" target="_blank" rel="noopener noreferrer" class="share-btn share-x">
+            🐦 X / Twitter
+          </a>
+          <a href="${telegramUrl}" target="_blank" rel="noopener noreferrer" class="share-btn share-telegram">
+            🔵 Telegram
+          </a>
+          <button id="btn-copy-share-link" class="share-btn share-copy">
+            🔗 Copiar Link
+          </button>
+        </div>
+
+        <div class="share-tips-panel" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 12px; font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; margin-bottom: var(--space-md);">
+          <strong style="color: #fff; display: block; margin-bottom: 4px;">📸 Redes Visuais (Instagram & TikTok):</strong>
+          1. Baixe o <strong>Card PNG</strong> clicando no botão acima.<br>
+          2. Crie sua postagem ou stories nestas plataformas.<br>
+          3. Cole o link nos stories via sticker ou coloque no link da bio!
+        </div>
+
+        <div class="modal-actions" style="margin-top: 15px;">
+          <button class="btn-secondary modal-close" style="width: 100%; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer;">Fechar</button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    const canvas = overlay.querySelector('#share-card-canvas');
+    if (canvas) {
+      this._renderShareCardCanvas(analysis, canvas, link);
+    }
+
+    // Eventos
+    const btnClose = overlay.querySelector('.modal-close');
+    const fechar = () => {
+      overlay.style.opacity = '0';
+      overlay.querySelector('.share-modal').style.transform = 'translateY(20px)';
+      setTimeout(() => overlay.remove(), 200);
+    };
+
+    btnClose.addEventListener('click', fechar);
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) fechar();
+    });
+
+    // Copiar Link
+    const btnCopy = overlay.querySelector('#btn-copy-share-link');
+    btnCopy.addEventListener('click', () => {
+      navigator.clipboard.writeText(link).then(() => {
+        this.showToast('Link copiado com sucesso!', 'success');
+      }).catch(() => {
+        this.showToast('Erro ao copiar link.', 'error');
+      });
+    });
+
+    // Baixar Card
+    const btnDownload = overlay.querySelector('#btn-download-card');
+    btnDownload.addEventListener('click', () => {
+      try {
+        const dataUrl = canvas.toDataURL('image/png');
+        const tempLink = document.createElement('a');
+        tempLink.href = dataUrl;
+        tempLink.download = `deeptrace-auditoria-${analysis.id || 'video'}.png`;
+        document.body.appendChild(tempLink);
+        tempLink.click();
+        document.body.removeChild(tempLink);
+        this.showToast('Card baixado com sucesso!', 'success');
+      } catch (err) {
+        console.error(err);
+        this.showToast('Falha ao baixar imagem do card.', 'error');
+      }
+    });
+  }
+
+  /**
+   * Renderiza a imagem do card de compartilhamento utilizando a API 2D de Canvas.
+   * 
+   * @param {Object} analysis — Objeto de análise ativo
+   * @param {HTMLCanvasElement} canvas — O elemento Canvas
+   * @param {string} link — Link de compartilhamento da análise
+   * @private
+   */
+  _renderShareCardCanvas(analysis, canvas, link) {
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+
+    // Fundo gradiente
+    const gradient = ctx.createLinearGradient(0, 0, width, height);
+    gradient.addColorStop(0, '#090a0f');
+    gradient.addColorStop(0.5, '#121424');
+    gradient.addColorStop(1, '#07080b');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, width, height);
+
+    // Borda neon decorativa
+    ctx.strokeStyle = 'rgba(108, 92, 231, 0.3)';
+    ctx.lineWidth = 6;
+    ctx.strokeRect(3, 3, width - 6, height - 6);
+
+    // Grade sutil decorativa
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.02)';
+    ctx.lineWidth = 1;
+    for (let i = 30; i < width; i += 30) {
+      ctx.beginPath();
+      ctx.moveTo(i, 0);
+      ctx.lineTo(i, height);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(0, i);
+      ctx.lineTo(width, i);
+      ctx.stroke();
+    }
+
+    // Cabeçalho
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 24px sans-serif';
+    ctx.fillText('🔍 DeepTrace', 30, 50);
+
+    ctx.fillStyle = '#8f8fa3';
+    ctx.font = 'bold 9px sans-serif';
+    ctx.fillText('INVESTIGAÇÃO CONTEXTUAL DE VÍDEOS', 30, 72);
+
+    // Linha horizontal
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(30, 90);
+    ctx.lineTo(width - 30, 90);
+    ctx.stroke();
+
+    // Vídeo URL ou origem
+    ctx.fillStyle = '#e2e2e9';
+    ctx.font = 'italic 13px sans-serif';
+    let originalUrl = analysis.url || 'Arquivo de Vídeo local';
+    if (originalUrl.length > 55) {
+      originalUrl = originalUrl.substring(0, 52) + '...';
+    }
+    ctx.fillText(`Vídeo: ${originalUrl}`, 30, 120);
+
+    // Veredito e Score
+    const score = analysis.overallScore !== undefined ? analysis.overallScore : 0;
+    const verdict = analysis.verdict || 'Não Verificado';
+    
+    let scoreColor = '#ff3838'; // vermelho (0-30%)
+    let scoreText = 'Falso ou Manipulado';
+    if (score > 60) {
+      scoreColor = '#2ed573'; // verde (61-100%)
+      scoreText = 'Verdadeiro e Seguro';
+    } else if (score > 30) {
+      scoreColor = '#ffa502'; // amarelo (31-60%)
+      scoreText = 'Impreciso ou Misturado';
+    }
+
+    // Card do Veredito (Container em destaque)
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
+    ctx.beginPath();
+    ctx.roundRect(30, 150, width - 60, 110, 12);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+    ctx.stroke();
+
+    // Label do Veredito
+    ctx.fillStyle = '#8f8fa3';
+    ctx.font = 'bold 11px sans-serif';
+    ctx.fillText('VEREDITO FINAL DA AUDITORIA', 45, 178);
+
+    // Veredito
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 22px sans-serif';
+    let displayVerdict = verdict;
+    if (displayVerdict.length > 25) {
+      displayVerdict = displayVerdict.substring(0, 22) + '...';
+    }
+    ctx.fillText(displayVerdict, 45, 212);
+    
+    // Status text
+    ctx.fillStyle = scoreColor;
+    ctx.font = 'bold 12px sans-serif';
+    ctx.fillText(`● ${scoreText.toUpperCase()}`, 45, 240);
+
+    // Círculo de score à direita
+    const circleX = width - 90;
+    const circleY = 205;
+    const radius = 35;
+
+    // Fundo do círculo
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+    ctx.lineWidth = 6;
+    ctx.beginPath();
+    ctx.arc(circleX, circleY, radius, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Arco preenchido
+    ctx.strokeStyle = scoreColor;
+    ctx.lineWidth = 6;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.arc(circleX, circleY, radius, -Math.PI / 2, (-Math.PI / 2) + (Math.PI * 2 * (score / 100)));
+    ctx.stroke();
+
+    // Score texto centralizado
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 18px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(`${score}%`, circleX, circleY - 2);
+    
+    ctx.fillStyle = '#8f8fa3';
+    ctx.font = 'bold 8px sans-serif';
+    ctx.fillText('CONFIANÇA', circleX, circleY + 12);
+    
+    // Restaurar propriedades de alinhamento
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+
+    // Resumo
+    ctx.fillStyle = '#8f8fa3';
+    ctx.font = 'bold 12px sans-serif';
+    ctx.fillText('RESUMO DOS FATOS E CONTEXTO', 30, 295);
+
+    ctx.fillStyle = '#e2e2e9';
+    ctx.font = '14px sans-serif';
+    
+    const wrapText = (text, x, y, maxWidth, lineHeight, maxLines = 5) => {
+      const words = text.split(' ');
+      let line = '';
+      let currentY = y;
+      let lineCount = 0;
+
+      for (let n = 0; n < words.length; n++) {
+        let testLine = line + words[n] + ' ';
+        let metrics = ctx.measureText(testLine);
+        let testWidth = metrics.width;
+        if (testWidth > maxWidth && n > 0) {
+          ctx.fillText(line, x, currentY);
+          line = words[n] + ' ';
+          currentY += lineHeight;
+          lineCount++;
+          if (lineCount >= maxLines - 1) {
+            ctx.fillText(line.trim() + '...', x, currentY);
+            return;
+          }
+        } else {
+          line = testLine;
+        }
+      }
+      ctx.fillText(line, x, currentY);
+    };
+
+    const summaryText = analysis.summary || 'Nenhum resumo da investigação disponível.';
+    wrapText(summaryText, 30, 322, width - 60, 20, 5);
+
+    // Divisória do rodapé
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(30, height - 70);
+    ctx.lineTo(width - 30, height - 70);
+    ctx.stroke();
+
+    // Rodapé
+    ctx.fillStyle = '#6c5ce7';
+    ctx.font = 'bold 14px sans-serif';
+    ctx.fillText('deeptrace.investigations.ai', 30, height - 38);
+
+    ctx.fillStyle = '#8f8fa3';
+    ctx.font = '10px sans-serif';
+    ctx.textAlign = 'right';
+    const fakeId = analysis.id ? analysis.id.substring(0, 8) : Math.floor(100000 + Math.random() * 900000);
+    ctx.fillText(`ID: DT-${fakeId}`, width - 30, height - 38);
+    
+    // Restaurar alinhamento de texto para evitar efeitos indesejados
+    ctx.textAlign = 'left';
   }
 };

@@ -68,7 +68,6 @@ window.DeepTraceStorage = class DeepTraceStorage {
             summary: analysis.summary || '',
             claims: analysis.claims || [],
             manipulationTechniques: analysis.manipulationTechniques || [],
-            deepfakeAnalysis: analysis.deepfakeAnalysis || null,
             metadata: analysis.metadata || {},
             timestamp: analysis.timestamp || new Date().toISOString()
         };
@@ -427,50 +426,44 @@ window.DeepTraceStorage = class DeepTraceStorage {
                 url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
                 platform: 'youtube',
                 title: 'Candidato faz declaração absurda sobre economia em entrevista',
-                overallScore: 15,
+                overallScore: 28,
                 verdict: 'Falso',
-                summary: 'O vídeo apresenta um trecho editado de forma enganosa, onde falas de diferentes momentos foram concatenadas para criar uma declaração inexistente. A análise de áudio revelou cortes abruptos e inconsistências na entonação.',
-                deepfakeAnalysis: {
-                    detected: false,
-                    confidence: 90,
-                    lipSync: 'Natural (movimentação labial perfeitamente sincronizada com a voz)',
-                    faceArtifacts: 'Natural (sem distorções nas bordas ou contornos faciais)',
-                    lightingCoherence: 'Coerente (padrões de luz e sombra correspondem ao cenário real)',
-                    blinkingPattern: 'Natural (frequência de piscadas normal)',
-                    details: 'O vídeo não apresenta indícios de manipulação visual por IA ou deepfake. A falsidade constatada provém de edição e cortes seletivos de áudio (recontextualização).'
-                },
+                summary: 'O vídeo apresenta um trecho editado de forma enganosa, onde falas de diferentes momentos foram concatenadas e recontextualizadas para fazer parecer que o candidato pretendia extinguir o salário mínimo e que dados antigos eram de 2026.',
                 claims: [
                     {
-                        claim: 'O candidato afirmou que pretende acabar com o salário mínimo',
+                        timestamp: '00:12',
+                        claim: 'O candidato afirmou que pretende acabar com o salário mínimo no país',
                         verdict: 'Falso',
                         confidence: 10,
-                        reasoning: 'Verificação cruzada com a entrevista original completa revelou que a fala foi editada seletivamente, removendo contexto.',
-                        sources: ['Entrevista original no canal oficial do candidato']
+                        reasoning: 'A verificação cruzada com a entrevista original completa revela que a fala foi recortada de forma seletiva. O candidato dizia: "Eu nunca pretenderia acabar com o salário mínimo". O trecho cortado removeu a negação.',
+                        sources: ['Entrevista original - TV Democracia', 'Checagem de Fatos - Aos Fatos']
                     },
                     {
-                        claim: 'A declaração foi feita durante debate ao vivo',
-                        verdict: 'Falso',
-                        confidence: 5,
-                        reasoning: 'Não há registro nos canais oficiais do debate. O cenário do vídeo é de um estúdio diferente.',
-                        sources: ['Registro oficial do debate — TSE']
+                        timestamp: '00:45',
+                        claim: 'O teto de gastos reduziu investimentos públicos em 50% neste ano',
+                        verdict: 'Parcialmente Verdadeiro',
+                        confidence: 45,
+                        reasoning: 'O teto reduziu investimentos reais em alguns setores, mas o índice geral de queda foi de 18% segundo o Tesouro Nacional, e não de 50%. A alegação infla o número artificialmente.',
+                        sources: ['Relatório de Investimentos - Tesouro Nacional']
                     },
                     {
-                        claim: 'O vídeo foi gravado em 2024',
+                        timestamp: '01:15',
+                        claim: 'Dados da inflação mostram piora absoluta e recorde histórico',
                         verdict: 'Falso',
-                        confidence: 12,
-                        reasoning: 'Metadados indicam edição recente com material de 2022, recontextualizado para parecer atual.',
-                        sources: ['Análise de metadados EXIF']
+                        confidence: 15,
+                        reasoning: 'O vídeo cita índices inflacionários elevados como se fossem atuais (2026), mas na realidade reutiliza dados antigos e desatualizados do ano de 2021 (pico da pandemia).',
+                        sources: ['Série Histórica do IPCA - IBGE']
                     }
                 ],
                 manipulationTechniques: [
-                    'Edição seletiva de áudio',
-                    'Descontextualização',
-                    'Concatenação de falas distintas'
+                    'Corte manipulativo (omissão de negação)',
+                    'Descontextualização temporal (dados de 2021)',
+                    'Estatística inflada / distorcida'
                 ],
                 metadata: {
                     language: 'pt-BR',
                     duration: '2:34',
-                    transcription: 'Trecho manipulado: "Eu pretendo... acabar com o salário... mínimo neste país..."'
+                    transcription: 'Trecho analisado: "Eu pretendo... acabar com o salário mínimo... e os dados da inflação mostram uma piora absoluta..."'
                 },
                 timestamp: new Date(agora.getTime() - 2 * 60 * 60 * 1000).toISOString()
             },
@@ -478,40 +471,33 @@ window.DeepTraceStorage = class DeepTraceStorage {
                 id: 'demo_002',
                 url: 'https://www.youtube.com/watch?v=abc123real',
                 platform: 'youtube',
-                title: 'Discurso completo do governador no comício de São Paulo',
-                overallScore: 82,
+                title: 'Pronunciamento oficial sobre investimentos em ferrovias',
+                overallScore: 92,
                 verdict: 'Verdadeiro',
-                summary: 'O vídeo contém o discurso real proferido pelo governador durante comício oficial. As falas foram confirmadas por múltiplas fontes jornalísticas e correspondem ao registro oficial do evento.',
-                deepfakeAnalysis: {
-                    detected: false,
-                    confidence: 95,
-                    lipSync: 'Natural (sincronismo labial exato com o áudio gravado)',
-                    faceArtifacts: 'Natural (texturas de pele e transições faciais fluidas)',
-                    lightingCoherence: 'Coerente (coerência exata de iluminação com o fundo)',
-                    blinkingPattern: 'Natural (expressões faciais e piscadas orgânicas)',
-                    details: 'Nenhum indício de manipulação facial ou de voz por IA foi detectado. O vídeo é um registro autêntico e íntegro do evento.'
-                },
+                summary: 'O vídeo contém o anúncio real feito pelo Ministério dos Transportes sobre o plano de infraestrutura de ferrovias. As alegações batem perfeitamente com os diários oficiais e editais publicados pelo governo.',
                 claims: [
                     {
-                        claim: 'O governador prometeu investimento de R$ 2 bilhões em saúde',
-                        verdict: 'Verdadeiro',
-                        confidence: 90,
-                        reasoning: 'Confirmado pelo portal oficial do governo estadual e cobertura jornalística.',
-                        sources: ['Portal oficial do governo estadual', 'Folha de S. Paulo']
-                    },
-                    {
-                        claim: 'O evento ocorreu no dia 15 de maio de 2026',
+                        timestamp: '00:20',
+                        claim: 'O plano prevê investimento de R$ 2 bilhões na malha ferroviária federal',
                         verdict: 'Verdadeiro',
                         confidence: 95,
-                        reasoning: 'Registros fotográficos e cobertura da imprensa local confirmam data e local.',
-                        sources: ['Agência Brasil', 'G1 São Paulo']
+                        reasoning: 'O Diário Oficial da União e o portal da transparência confirmam o contingenciamento e aprovação de R$ 2,1 bilhões específicos para o Plano Nacional de Ferrovias.',
+                        sources: ['Diário Oficial da União - Edição Extra', 'Portal da Transparência']
+                    },
+                    {
+                        timestamp: '01:45',
+                        claim: 'O projeto gerará mais de 50 mil novos empregos diretos',
+                        verdict: 'Verdadeiro',
+                        confidence: 88,
+                        reasoning: 'Estimativa técnica baseada nas licitações e contratos das concessionárias ferroviárias ratifica a criação de aproximadamente 52.300 postos de trabalho diretos na fase de implantação.',
+                        sources: ['Estudo de Impacto Socioeconômico - Ministério do Trabalho']
                     }
                 ],
                 manipulationTechniques: [],
                 metadata: {
                     language: 'pt-BR',
-                    duration: '18:45',
-                    transcription: '"Nosso compromisso é investir dois bilhões de reais na saúde pública do estado..."'
+                    duration: '5:45',
+                    transcription: '"Nosso plano de transportes prevê o repasse de dois bilhões de reais nas ferrovias e a criação de cinquenta mil postos..."'
                 },
                 timestamp: new Date(agora.getTime() - 24 * 60 * 60 * 1000).toISOString()
             },
@@ -519,50 +505,44 @@ window.DeepTraceStorage = class DeepTraceStorage {
                 id: 'demo_003',
                 url: 'https://www.youtube.com/watch?v=stats_mixed',
                 platform: 'youtube',
-                title: 'Influenciador apresenta dados sobre criminalidade no Brasil',
-                overallScore: 45,
+                title: 'Influenciador de finanças discute taxas de juros e PIB',
+                overallScore: 52,
                 verdict: 'Parcialmente Verdadeiro',
-                summary: 'O vídeo mistura dados estatísticos reais com interpretações distorcidas. Alguns números citados são precisos segundo fontes oficiais, mas a narrativa ignora contexto temporal e metodológico, induzindo conclusões equivocadas.',
-                deepfakeAnalysis: {
-                    detected: false,
-                    confidence: 88,
-                    lipSync: 'Natural (movimentos orais condizentes com a fala do influenciador)',
-                    faceArtifacts: 'Natural (contornos de rosto limpos e definidos)',
-                    lightingCoherence: 'Coerente (distribuição de luz realista no rosto e cenário)',
-                    blinkingPattern: 'Natural (piscar de olhos e expressões naturais)',
-                    details: 'O vídeo apresenta apenas manipulação retórica (cherry-picking de dados), mas o conteúdo de imagem e voz é real e autêntico.'
-                },
+                summary: 'O vídeo traz alguns dados econômicos corretos, porém selecionados de forma parcial (cherry-picking) para corroborar um cenário de crise generalizada que diverge dos dados macroeconômicos oficiais completos.',
                 claims: [
                     {
-                        claim: 'A taxa de homicídios caiu 20% em 2025',
-                        verdict: 'Verdadeiro',
-                        confidence: 85,
-                        reasoning: 'Dados do Fórum Brasileiro de Segurança Pública confirmam a tendência de queda.',
-                        sources: ['Fórum Brasileiro de Segurança Pública — Relatório 2025']
-                    },
-                    {
-                        claim: 'O Brasil é o país mais violento do mundo',
-                        verdict: 'Falso',
-                        confidence: 15,
-                        reasoning: 'Ranking da ONU coloca o Brasil em 12º lugar, não em 1º como afirmado.',
-                        sources: ['UNODC Global Study on Homicide 2025']
-                    },
-                    {
-                        claim: 'Investimentos em segurança dobraram nos últimos 5 anos',
+                        timestamp: '00:15',
+                        claim: 'A taxa básica de juros atingiu o seu maior patamar histórico',
                         verdict: 'Falso',
                         confidence: 20,
-                        reasoning: 'Dados do Tesouro Nacional mostram aumento de apenas 34%, não 100%.',
-                        sources: ['Tesouro Nacional — Portal da Transparência']
+                        reasoning: 'A taxa atual está elevada, porém bem abaixo dos picos históricos brasileiros das décadas de 1990 (quando passou de 40%) ou mesmo de 2016 (quando bateu 14,25%).',
+                        sources: ['Série Histórica da Taxa Selic - Banco Central do Brasil']
+                    },
+                    {
+                        timestamp: '00:52',
+                        claim: 'A inflação oficial acumulada nos últimos 12 meses está em 4,5%',
+                        verdict: 'Verdadeiro',
+                        confidence: 94,
+                        reasoning: 'O dado apresentado é verdadeiro e condiz exatamente com o último boletim divulgado pelo IBGE sobre o IPCA acumulado.',
+                        sources: ['Boletim do IPCA - IBGE']
+                    },
+                    {
+                        timestamp: '01:30',
+                        claim: 'O PIB brasileiro apresentou retração no último trimestre fiscal',
+                        verdict: 'Inconclusivo',
+                        confidence: 50,
+                        reasoning: 'O PIB apresentou crescimento nulo (0,0%) no último relatório prévio, o que aponta para estagnação, mas não caracteriza retração/recessão técnica formalizada até o momento.',
+                        sources: ['Relatório Trimestral do PIB - IBGE']
                     }
                 ],
                 manipulationTechniques: [
-                    'Cherry-picking de dados estatísticos',
-                    'Omissão de contexto temporal'
+                    'Cherry-picking (seleção tendenciosa de dados)',
+                    'Narrativa alarmista ou desproporcional'
                 ],
                 metadata: {
                     language: 'pt-BR',
-                    duration: '12:08',
-                    transcription: '"Os números não mentem: a criminalidade caiu 20%, mas o Brasil continua sendo o país mais violento..."'
+                    duration: '3:10',
+                    transcription: '"A Selic está no topo histórico e o PIB está caindo, embora a inflação esteja controlada em quatro e meio..."'
                 },
                 timestamp: new Date(agora.getTime() - 3 * 24 * 60 * 60 * 1000).toISOString()
             },
@@ -570,44 +550,45 @@ window.DeepTraceStorage = class DeepTraceStorage {
                 id: 'demo_004',
                 url: 'https://www.youtube.com/watch?v=deepfake_pol',
                 platform: 'youtube',
-                title: 'Suposto pronunciamento de senador sobre renúncia',
-                overallScore: 8,
+                title: 'Vídeo viral mostra suposta enchente devastadora recente',
+                overallScore: 10,
                 verdict: 'Falso',
-                summary: 'Análise técnica identificou o vídeo como deepfake gerado por inteligência artificial. Há inconsistências visíveis nos movimentos labiais, artefatos visuais ao redor do rosto e a voz apresenta padrões sintéticos detectáveis.',
-                deepfakeAnalysis: {
-                    detected: true,
-                    confidence: 92,
-                    lipSync: 'Inconsistente (há pequenos atrasos e desalinhamentos entre a fala e a movimentação orquestrada da boca)',
-                    faceArtifacts: 'Artefatos detectados (leve desfoque ou perda de nitidez na linha da mandíbula durante rotações de cabeça)',
-                    lightingCoherence: 'Inconsistente (a iluminação do rosto do senador não corresponde à luz difusa do cenário do fundo)',
-                    blinkingPattern: 'Suspeito (piscar de olhos extremamente reduzido e movimentos oculares artificiais)',
-                    details: 'Análise técnica detectou forte probabilidade de manipulação por inteligência artificial. O vídeo exibe traços característicos de substituição facial (face swap) e síntese vocal computadorizada.'
-                },
+                summary: 'O vídeo viralizado nas redes como sendo um desastre climático recente é, na verdade, um caso clássico de reciclagem de conteúdo. O vídeo original retrata uma tempestade ocorrida em 2022, usada fora de contexto temporal.',
                 claims: [
                     {
-                        claim: 'O senador anunciou sua renúncia ao cargo',
-                        verdict: 'Falso',
-                        confidence: 3,
-                        reasoning: 'Gabinete do senador negou qualquer pronunciamento e confirmou que o vídeo é falso.',
-                        sources: ['Assessoria de imprensa do gabinete do senador']
-                    },
-                    {
-                        claim: 'O vídeo foi gravado no Senado Federal',
+                        timestamp: '00:05',
+                        claim: 'Imagens aéreas mostram a enchente devastadora de ontem no Sul do país',
                         verdict: 'Falso',
                         confidence: 5,
-                        reasoning: 'O cenário foi gerado artificialmente — iluminação e perspectiva são inconsistentes com o plenário real.',
-                        sources: ['Comparação visual com imagens oficiais do Senado']
+                        reasoning: 'Busca reversa de imagens e checagem cruzada confirmam que as filmagens são do desastre ocorrido no inverno de 2022. O vídeo foi republicado sem alteração visual, mas alegando ser atual.',
+                        sources: ['Matéria original do G1 de julho de 2022', 'Desmentido - Agência Lupa']
+                    },
+                    {
+                        timestamp: '00:37',
+                        claim: 'O governo local não enviou ajuda financeira para a Defesa Civil da região',
+                        verdict: 'Falso',
+                        confidence: 8,
+                        reasoning: 'O portal de transparência do estado registra o repasse emergencial de R$ 15 milhões em recursos específicos para a Defesa Civil do município nos últimos dois meses de 2026.',
+                        sources: ['Portal da Transparência Estadual - Repasses Defesa Civil']
+                    },
+                    {
+                        timestamp: '01:02',
+                        claim: 'O desastre climático deixou mais de 10 mil desabrigados na cidade',
+                        verdict: 'Falso',
+                        confidence: 12,
+                        reasoning: 'Mesmo nas enchentes severas de 2022, o número de desabrigados no município em questão foi de 450 pessoas. O número de 10 mil foi inventado para gerar engajamento emocional.',
+                        sources: ['Boletim Oficial de Desastres - Defesa Civil']
                     }
                 ],
                 manipulationTechniques: [
-                    'Deepfake facial',
-                    'Síntese de voz por IA',
-                    'Cenário gerado artificialmente'
+                    'Reciclagem de vídeo antigo (descontextualização temporal)',
+                    'Estatística inventada / inflada',
+                    'Falsa alegação de omissão governamental'
                 ],
                 metadata: {
                     language: 'pt-BR',
-                    duration: '1:52',
-                    transcription: '"Venho a público comunicar minha decisão irrevogável de deixar o cargo de senador..."'
+                    duration: '1:45',
+                    transcription: '"Vejam a destruição das águas ontem... Nenhuma ajuda chegou e já são dez mil pessoas nas ruas..."'
                 },
                 timestamp: new Date(agora.getTime() - 5 * 24 * 60 * 60 * 1000).toISOString()
             }

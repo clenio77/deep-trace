@@ -3,20 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="DeepTrace — Detector de Fake News em Vídeos. Use inteligência artificial para verificar a veracidade de vídeos políticos e eleitorais no Brasil.">
-  <meta name="keywords" content="fake news, detector, vídeo, eleições, Brasil, verificação, fact-checking, deepfake, IA">
+  <meta name="description" content="DeepTrace — Investigação Contextual de Vídeos Virais. Decomponha narrativas, investigue inconsistências temporais e verifique claims com inteligência artificial.">
+  <meta name="keywords" content="desinformação, contexto, vídeo, eleições, Brasil, verificação, fact-checking, timeline contextual, OSINT, IA">
   <meta name="author" content="DeepTrace">
   <meta name="theme-color" content="#060a14">
 
   <!-- Open Graph / Redes Sociais -->
   <meta property="og:type" content="website">
-  <meta property="og:title" content="DeepTrace — Detector de Fake News em Vídeos">
-  <meta property="og:description" content="Inteligência artificial a serviço da democracia brasileira. Verifique vídeos suspeitos em segundos.">
+  <meta property="og:title" content="DeepTrace — Investigação Contextual de Vídeos Virais">
+  <meta property="og:description" content="Inteligência artificial a serviço da verdade. Decomponha vídeos virais em uma linha do tempo de fatos e verifique claims.">
   <meta property="og:image" content="https://deep-trace-nine.vercel.app/assets/og-banner.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
 
-  <title>DeepTrace — Detector de Fake News em Vídeos</title>
+  <title>DeepTrace — Investigação Contextual de Vídeos Virais</title>
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="assets/logo.png">
@@ -65,11 +65,11 @@
         Powered by Gemini AI
       </div>
 
-      <h1>Desvende a <span class="text-gradient">verdade</span> por trás dos vídeos</h1>
+      <h1>Investigação de <span class="text-gradient">contexto</span> em vídeos virais</h1>
 
       <p class="hero-subtitle">
-        Inteligência artificial a serviço da democracia brasileira.
-        Verifique vídeos suspeitos em segundos e combata a desinformação.
+        Decomponha narrativas audiovisuais em uma linha do tempo de alegações.
+        Mapeie inconsistências, dados desatualizados e omissões em segundos com IA.
       </p>
 
       <button class="btn-primary" id="cta-btn">
@@ -83,7 +83,7 @@
     <div class="container">
       <div class="section-title fade-in-up">
         <h2>Analise um <span class="text-gradient">Vídeo</span></h2>
-        <p>Cole o link do vídeo suspeito ou faça upload de um arquivo para verificação instantânea.</p>
+        <p>Cole o link do vídeo viral ou envie um arquivo para extrair alegações e iniciar a verificação de contexto.</p>
       </div>
 
       <div class="analyze-card glass-card-accent fade-in-up">
@@ -144,7 +144,7 @@
         </div>
         <div class="metric-item">
           <span class="metric-value" id="metric-fake" data-target="0">0</span>
-          <span class="metric-label">Fake News Detectadas</span>
+          <span class="metric-label">Inconsistências Mapeadas</span>
         </div>
         <div class="metric-item">
           <span class="metric-value" id="metric-score" data-target="0">0</span>
@@ -204,14 +204,14 @@
 
         <div class="glass-card step-card fade-in-up">
           <div class="step-number">2</div>
-          <h3>IA Analisa</h3>
-          <p>Nossa inteligência artificial transcreve o áudio, identifica alegações factuais e analisa o contexto.</p>
+          <h3>Decomposição de Claims</h3>
+          <p>O sistema transcreve o áudio, extrai os claims e organiza uma linha do tempo cronológica com cada alegação.</p>
         </div>
 
         <div class="glass-card step-card fade-in-up">
           <div class="step-number">3</div>
-          <h3>Verificação</h3>
-          <p>Cada alegação é verificada individualmente com raciocínio detalhado e fontes quando disponíveis.</p>
+          <h3>Investigação na Web</h3>
+          <p>A IA busca fontes oficiais, confronta datas e mapeia incoerências no Google Search Grounding em tempo real.</p>
         </div>
 
         <div class="glass-card step-card fade-in-up">
@@ -235,13 +235,13 @@
         <div class="glass-card about-card fade-in-up">
           <div class="about-card__icon">🎯</div>
           <h3>Nossa Missão</h3>
-          <p>Democratizar o acesso a ferramentas de verificação de fatos, capacitando cidadãos brasileiros a identificar desinformação em vídeos políticos e eleitorais com o apoio de inteligência artificial.</p>
+          <p>Democratizar ferramentas de inteligência investigativa em mídia (OSINT), capacitando jornalistas, pesquisadores e cidadãos a expor manipulações contextuais em vídeos virais.</p>
         </div>
 
         <div class="glass-card about-card fade-in-up">
           <div class="about-card__icon">🔬</div>
           <h3>Metodologia</h3>
-          <p>Utilizamos o modelo multimodal Google Gemini 2.0 Flash para transcrever, decompor e verificar cada alegação factual presente no vídeo, confrontando com bases de conhecimento e fontes jornalísticas.</p>
+          <p>Utilizamos o Google Gemini 2.0 Flash e pesquisa em tempo real para extrair alegações, cruzar datas históricas e checar fatos contra portais oficiais e bases jornalísticas de forma automatizada.</p>
         </div>
 
         <div class="glass-card about-card fade-in-up">
@@ -343,6 +343,26 @@
       </div>
     </div>
   </footer>
+
+  <!-- ===== Bottom Navigation Bar (Mobile PWA) ===== -->
+  <nav class="bottom-nav" id="bottom-nav">
+    <a href="#analyze" class="bottom-nav-item active">
+      <span class="bottom-nav-icon">🔍</span>
+      <span class="bottom-nav-label">Analisar</span>
+    </a>
+    <a href="#history" class="bottom-nav-item">
+      <span class="bottom-nav-icon">📊</span>
+      <span class="bottom-nav-label">Histórico</span>
+    </a>
+    <a href="#how-it-works" class="bottom-nav-item">
+      <span class="bottom-nav-icon">💡</span>
+      <span class="bottom-nav-label">Instruções</span>
+    </a>
+    <button class="bottom-nav-item" id="bottom-settings-btn" style="background: none; border: none; padding: 0; cursor: pointer; font-family: inherit;">
+      <span class="bottom-nav-icon">⚙️</span>
+      <span class="bottom-nav-label">Config</span>
+    </button>
+  </nav>
 
   <!-- ===== Scripts ===== -->
   <script src="js/storage.js"></script>

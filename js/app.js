@@ -75,6 +75,7 @@ window.DeepTraceApp = class DeepTraceApp {
         this._checkQueryParamAnalysis();
         this.ui.initFaqAccordion();
         this._updateMetrics();
+        this._syncBottomNav();
         
         // Lógica temporária de teste para simular cliques de demos por query param
         try {
@@ -110,7 +111,9 @@ window.DeepTraceApp = class DeepTraceApp {
             filterPlatform: document.querySelector('#filter-platform'),
             filterVerdict: document.querySelector('#filter-verdict'),
             menuToggle: document.querySelector('#menu-toggle'),
-            headerNav: document.querySelector('#header-nav')
+            headerNav: document.querySelector('#header-nav'),
+            bottomSettingsBtn: document.querySelector('#bottom-settings-btn'),
+            bottomNavItems: document.querySelectorAll('.bottom-nav-item')
         };
     }
 
@@ -119,7 +122,7 @@ window.DeepTraceApp = class DeepTraceApp {
      * @private
      */
     _registerEventListeners() {
-        const { analyzeInput, analyzeBtn, uploadInput, uploadArea, settingsBtn, ctaBtn, menuToggle, headerNav, filterPlatform, filterVerdict } = this.elements;
+        const { analyzeInput, analyzeBtn, uploadInput, uploadArea, settingsBtn, ctaBtn, menuToggle, headerNav, filterPlatform, filterVerdict, bottomSettingsBtn, bottomNavItems } = this.elements;
 
         // a) Botão analisar
         if (analyzeBtn) {
@@ -179,6 +182,19 @@ window.DeepTraceApp = class DeepTraceApp {
         // f) Botão de configurações
         if (settingsBtn) {
             settingsBtn.addEventListener('click', () => this.handleSettings());
+        }
+
+        // f2) Botão de configurações na barra inferior (mobile)
+        if (bottomSettingsBtn) {
+            bottomSettingsBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.handleSettings();
+            });
+        }
+
+        // f3) Sincronização automática da Bottom Nav com o hash da URL
+        if (bottomNavItems) {
+            window.addEventListener('hashchange', () => this._syncBottomNav());
         }
 
         // g) Botão CTA do hero — scroll suave para a seção de análise
@@ -688,22 +704,7 @@ window.DeepTraceApp = class DeepTraceApp {
             `*Resumo:* ${resumo}\n\n` +
             `Verifique a análise detalhada aqui: ${linkCompartilhavel}`;
 
-        if (navigator.share) {
-            try {
-                await navigator.share({
-                    title: `Auditoria de Vídeo — ${veredito}`,
-                    text: textoCompartilhar,
-                    url: linkCompartilhavel
-                });
-                this.ui.showToast('Relatório compartilhado com sucesso!', 'success');
-            } catch (err) {
-                if (err.name !== 'AbortError') {
-                    this._copyTextToClipboard(textoCompartilhar);
-                }
-            }
-        } else {
-            this._copyTextToClipboard(textoCompartilhar);
-        }
+        this.ui.showShareModal(analysis, linkCompartilhavel, textoCompartilhar);
     }
 
     /**
@@ -754,6 +755,27 @@ window.DeepTraceApp = class DeepTraceApp {
         if (this.elements.resultSection) {
             this.elements.resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
+    }
+
+    /**
+     * Sincroniza a classe ativa da Bottom Navigation móvel com o hash atual da URL.
+     * @private
+     */
+    _syncBottomNav() {
+        const hash = window.location.hash || '#analyze';
+        const { bottomNavItems } = this.elements;
+
+        if (!bottomNavItems) return;
+
+        bottomNavItems.forEach(item => {
+            if (item.id === 'bottom-settings-btn') return;
+            const href = item.getAttribute('href');
+            if (href === hash) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        });
     }
 };
 
