@@ -348,11 +348,19 @@ section {
 }
 
 .hero-logo {
-  width: 100px;
-  height: 100px;
+  width: 120px;
+  height: 120px;
   margin: 0 auto var(--space-xl);
   filter: drop-shadow(0 0 20px rgba(0, 212, 255, 0.5));
   animation: logoPulse 4s ease-in-out infinite;
+  transition: width var(--transition), height var(--transition);
+}
+
+@media (min-width: 992px) {
+  .hero-logo {
+    width: 150px;
+    height: 150px;
+  }
 }
 
 @keyframes logoPulse {
@@ -1478,8 +1486,8 @@ section {
   }
 
   .hero-logo {
-    width: 72px;
-    height: 72px;
+    width: 80px;
+    height: 80px;
   }
 
   .input-group {
