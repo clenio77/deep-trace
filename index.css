@@ -203,12 +203,14 @@ section {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
+  transition: gap var(--transition);
 }
 
 .header-logo img {
   width: 36px;
   height: 36px;
   filter: drop-shadow(0 0 8px rgba(0, 212, 255, 0.4));
+  transition: width var(--transition), height var(--transition);
 }
 
 .header-logo span {
@@ -219,6 +221,20 @@ section {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  transition: font-size var(--transition);
+}
+
+@media (min-width: 992px) {
+  .header-logo img {
+    width: 44px;
+    height: 44px;
+  }
+  .header-logo span {
+    font-size: 1.7rem;
+  }
+  .header-logo {
+    gap: var(--space-md);
+  }
 }
 
 .header-nav {
