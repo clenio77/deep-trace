@@ -74,8 +74,8 @@ window.DeepTraceUI = class DeepTraceUI {
         <div class="loading-step" id="step-verification" style="display: flex; gap: 16px; align-items: flex-start; opacity: 0.3; transition: opacity 0.3s ease;">
           <div class="step-icon" style="font-size: 1.2rem; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.05); border-radius: 50%;">⚪</div>
           <div class="step-details">
-            <h4 style="font-size: 0.95rem; font-weight: 600; color: var(--text-primary); margin: 0 0 2px;">3. Auditoria de Fatos & Deepfake</h4>
-            <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0;">Confrontando alegações com base de conhecimento e analisando manipulações na imagem...</p>
+            <h4 style="font-size: 0.95rem; font-weight: 600; color: var(--text-primary); margin: 0 0 2px;">3. Investigação Contextual & Fact-Checking</h4>
+            <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0;">Confrontando alegações com a Web em tempo real por meio de busca inteligente...</p>
           </div>
         </div>
         <div class="loading-step" id="step-report" style="display: flex; gap: 16px; align-items: flex-start; opacity: 0.3; transition: opacity 0.3s ease;">
@@ -817,6 +817,25 @@ window.DeepTraceUI = class DeepTraceUI {
     const cor = this._getScoreColor(analysis.overallScore);
     const icone = this._getVerdictIcon(analysis.verdict);
 
+    const isInconclusive = analysis.verdict === 'Inconclusivo';
+    const hasNoClaims = !analysis.claims || analysis.claims.length === 0;
+
+    let inconclusiveBanner = '';
+    if (isInconclusive || hasNoClaims) {
+      inconclusiveBanner = `
+        <div class="inconclusive-banner" style="background: rgba(108, 92, 231, 0.08); border: 1px dashed rgba(108, 92, 231, 0.3); border-radius: var(--radius-md); padding: 16px; margin: 16px 0; text-align: left;">
+          <h4 style="margin: 0 0 6px 0; color: #fff; font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">💡 Dica para Análises mais precisas:</h4>
+          <p style="margin: 0; font-size: 0.82rem; color: var(--text-secondary); line-height: 1.45;">
+            Redes sociais como <strong>X (Twitter), Instagram e TikTok</strong> protegem seus conteúdos com telas de login e restrições de robôs, impedindo que IAs acessem e transcrevam o áudio diretamente pela URL.
+          </p>
+          <ul style="margin: 8px 0 0 0; padding-left: 20px; font-size: 0.82rem; color: var(--text-secondary); line-height: 1.45;">
+            <li><strong>Use nossa Extensão do Chrome</strong>: Ela captura a transcrição do vídeo diretamente da aba ativa no seu navegador.</li>
+            <li><strong>Faça o upload do vídeo</strong>: Baixe o arquivo de vídeo no seu dispositivo e faça o upload dele no formulário acima. Isso permite que a IA analise o áudio e frames de forma direta por multimodalidade.</li>
+          </ul>
+        </div>
+      `;
+    }
+
     layer.innerHTML = `
       ${this._createScoreGauge(analysis.overallScore)}
       <div class="result-verdict" style="color: ${cor};">
@@ -825,23 +844,25 @@ window.DeepTraceUI = class DeepTraceUI {
       </div>
       <p class="result-summary">${this._escapeHtml(analysis.summary || '')}</p>
 
+      ${inconclusiveBanner}
+
       <div class="score-legend-box">
         <p class="score-legend__title">💡 Como interpretar este score:</p>
         <p class="score-legend__text">
-          Este termômetro indica a confiabilidade geral do vídeo analisado por IA. Ele avalia se as falas são verdadeiras e se há manipulações de áudio/imagem:
+          Este termômetro indica a confiabilidade geral do vídeo analisado por IA. Ele avalia se as alegações feitas são baseadas em fatos reais e se o conteúdo foi apresentado no contexto correto:
         </p>
         <div class="score-ranges-bar">
           <div class="score-range range--low">
             <span class="range-indicator" style="background-color: var(--danger);"></span>
-            <span class="range-label"><strong>0 a 30%</strong>: Falso ou Manipulado</span>
+            <span class="range-label"><strong>0 a 30%</strong>: Falso ou Fora de Contexto</span>
           </div>
           <div class="score-range range--mid">
             <span class="range-indicator" style="background-color: var(--warning);"></span>
-            <span class="range-label"><strong>31 a 60%</strong>: Impreciso ou Misturado</span>
+            <span class="range-label"><strong>31 a 60%</strong>: Impreciso ou Sem Contexto</span>
           </div>
           <div class="score-range range--high">
             <span class="range-indicator" style="background-color: var(--success);"></span>
-            <span class="range-label"><strong>61 a 100%</strong>: Verdadeiro e Seguro</span>
+            <span class="range-label"><strong>61 a 100%</strong>: Factual e Confiável</span>
           </div>
         </div>
       </div>

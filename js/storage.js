@@ -32,8 +32,33 @@ window.DeepTraceStorage = class DeepTraceStorage {
         /** @type {string} Chave do controle de rate limiting no localStorage */
         this.rateLimitKey = 'deeptrace_rate_limit';
 
+        /** @type {string} Chave de versão para limpeza de cache obsoleto */
+        this.versionKey = 'deeptrace_storage_version';
+        
+        /** @type {string} Versão atual do storage (força atualização ao mudar) */
+        this.currentVersion = '2.0';
+
+        // Executa a migração/limpeza se o usuário vier de uma versão antiga
+        this._migrateStorage();
+
         /** @type {Array<Object>} Histórico de análises em memória */
         this.history = this._loadFromStorage();
+    }
+
+    /**
+     * Limpa o histórico obsoleto contendo referências de deepfake se a versão mudou.
+     * @private
+     */
+    _migrateStorage() {
+        try {
+            const storedVersion = localStorage.getItem(this.versionKey);
+            if (storedVersion !== this.currentVersion) {
+                localStorage.removeItem(this.storageKey);
+                localStorage.setItem(this.versionKey, this.currentVersion);
+            }
+        } catch (e) {
+            console.warn('[DeepTrace Storage] Falha ao executar migração de dados:', e);
+        }
     }
 
     // ─────────────────────────────────────────────

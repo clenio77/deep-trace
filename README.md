@@ -52,8 +52,8 @@ sequenceDiagram
   * **Camada 2 (Audit de Alegações)**: Isolamento das alegações individuais extraídas do áudio com análise de confiabilidade (%), fontes oficiais de fact-checking e explicações lógicas detalhadas.
   * **Camada 3 (Mapeamento de Manipulação)**: Identificação de truques retóricos comuns (ex: descontextualização temporal, apelo emocional, cherry-picking).
   * **Camada 4 (Transcrição & Metadados)**: Exibição da transcrição com o badge indicativo de importação via extensão.
-* **Âncora Temporal Dinâmica**: O motor do prompt injeta a data/hora real em tempo real para evitar alucinações comuns de IA sobre o ano corrente (ex: alegar que "ainda estamos em 2024").
-* **Detecção de Deepfake (Upload Local)**: Permite o upload de arquivos de vídeo de até 50MB. O arquivo é enviado como `inline_data` para análise multimodal completa dos frames.
+* **Âncora Temporal Dinâmica**: O motor do prompt injeta a data/hora real em tempo real para evitar alucinações comuns de IA sobre o ano corrente (ex: alegar que "ainda estamos em 2026").
+* **Análise Multimodal (Upload de Vídeo Local)**: Permite o upload de arquivos de vídeo de até 50MB. O arquivo é enviado de forma segura como dados binários inline para que a IA analise a coerência entre áudio e imagens em busca de manipulação de contexto.
 * **Histórico com Cache local FIFO**: Salva até 50 análises anteriores no LocalStorage, garantindo carregamento instantâneo.
 
 ---
